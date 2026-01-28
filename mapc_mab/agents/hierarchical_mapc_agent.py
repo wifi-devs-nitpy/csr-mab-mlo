@@ -39,6 +39,8 @@ class HierarchicalMapcAgent(MapcAgent):
         The function which translates the action of the agent to the tuple of APs sharing the channel.
     sta_group_action_to_sta_group : Callable
         The function which translates the action of the agent to the list of served stations.
+    link_action_to_link_group: Callable
+        The function which translate the link action of the agent to the list of links that the station uses
     tx_matrix_shape : Shape
         The shape of the transmission matrix.
     """
@@ -50,8 +52,14 @@ class HierarchicalMapcAgent(MapcAgent):
             find_groups_dict: dict[int, int],
             assign_stations_agents: dict[int, RLib],
             assign_stations_dict: dict[tuple[tuple, int], tuple[int, int]],
-            select_tx_power_agent: RLib,
-            select_tx_power_dict: dict[tuple[tuple, int], int],
+
+            assign_links_agent: RLib,
+            assign_links_dict: dict[tuple[tuple, int], int],
+
+            select_tx_power_agent: dict[int, RLib],
+            select_tx_power_dict: dict[tuple[tuple, int, int], int],
+
+            link_action_to_link_group: Callable,
             ap_group_action_to_ap_group: Callable,
             sta_group_action_to_sta_group: Callable,
             tx_matrix_shape: Shape,
@@ -67,12 +75,18 @@ class HierarchicalMapcAgent(MapcAgent):
         self.assign_stations_agents = assign_stations_agents
         self.assign_stations_dict = assign_stations_dict
         self.assign_stations_last_step = defaultdict(int)
+
+        self.assign_links_agent = assign_links_agent 
+        self.assign_links_dict = assign_links_dict
+        self.assign_links_last_step = defaultdict(int)
+        
         self.select_tx_power_agent = select_tx_power_agent
         self.select_tx_power_dict = select_tx_power_dict
-        self.select_tx_power_last_step = defaultdict(int)
+        self.select_tx_power_last_step = defaultdict(lambda: defaultdict(int))
 
         self.ap_group_action_to_ap_group = ap_group_action_to_ap_group
         self.sta_group_action_to_sta_group = sta_group_action_to_sta_group
+        self.link_action_to_link_group = link_action_to_link_group
         self.tx_matrix_shape = tx_matrix_shape
         self.tx_power_levels = tx_power_levels
 
@@ -118,20 +132,67 @@ class HierarchicalMapcAgent(MapcAgent):
         all_aps_sort = np.argsort(np.asarray(tuple(ap_group) + (sharing_ap,)))
         all_stas = tuple(np.asarray(tuple(sta_group) + (designated_station,))[all_aps_sort].tolist())
 
-        # Sample the agent which assigns tx power
-        tx_power = np.zeros(self.n_nodes, dtype=np.int32)
+        link_ap_sta = {
+            0: {
+                "ap_sta_pairs": [], 
+                "tx_power_array": np.zeros(self.n_nodes, dtype=np.int32), 
+                "tx_matrix": np.zeros((self.n_nodes, self.n_nodes))
+            }, 
+            1: {
+                "ap_sta_pairs": [], 
+                "tx_power_array": np.zeros(self.n_nodes, dtype=np.int32), 
+                "tx_matrix": np.zeros((self.n_nodes, self.n_nodes))
+            }, 
+            2: {
+                "ap_sta_pairs": [], 
+                "tx_power_array": np.zeros(self.n_nodes, dtype=np.int32), 
+                "tx_matrix": np.zeros((self.n_nodes, self.n_nodes))
+            }
+        }
+        # the above dictionary will be minified later, by not violating the DRY rule
 
+        # sampling the links
         for i, (ap, sta) in enumerate(zip(all_aps, all_stas)):
-            reward = self.rewards[self.select_tx_power_last_step[all_aps, sta]]
-            self.select_tx_power_last_step[all_aps, sta] = self.step
-            idx = self.select_tx_power_dict[all_aps, sta]
-            tx_power[ap] = self.select_tx_power_agent.sample(reward, agent_id=idx).item()
+            reward = self.rewards[self.assign_links_last_step[all_aps, sta]]
+            self.assign_links_last_step[all_aps, sta] = self.step
+            idx = self.assign_links_dict[all_aps, sta]
+            link_action = self.assign_links_agent.sample(reward, agent_id=idx)
 
-        # Create the transmission matrix based on the sampled pairs
-        tx_matrix = np.zeros(self.tx_matrix_shape, dtype=np.int32)
-        tx_matrix[sharing_ap, designated_station] = 1
+            #decode logic for the assign_links_agent_action_to_links
+            links = self.link_action_to_link_group(link_action)
 
-        for ap, sta in zip(ap_group, sta_group):
-            tx_matrix[ap, sta] = 1
+            # links is a tuple for that particular station 
+            for link in links: 
+                link_ap_sta[link]["ap_sta_pairs"].append((ap, sta))
+                
 
-        return tx_matrix, tx_power
+        # # Sample the agent which assigns tx power
+        # tx_power = np.zeros(self.n_nodes, dtype=np.int32)
+
+        # for i, (ap, sta) in enumerate(zip(all_aps, all_stas)):
+        #     reward = self.rewards[self.select_tx_power_last_step[all_aps, sta, link]]
+        #     self.select_tx_power_last_step[all_aps, sta, link] = self.step
+        #     idx = self.select_tx_power_dict[all_aps, sta]
+        #     tx_power[ap] = self.select_tx_power_agent.sample(reward, agent_id=idx).item()
+
+        for link in link_ap_sta.keys():
+            for (ap, sta) in link_ap_sta[link]["ap_sta_pairs"]:
+                reward_idx = self.select_tx_power_last_step[link][all_aps, sta, link]
+                self.select_tx_power_last_step[link][all_aps, sta, link] = self.step
+                reward = self.rewards[reward_idx]
+                agent_idx = self.select_tx_power_dict[link][all_aps, sta, link]
+                tx_power = self.select_tx_power_agent[link].sample(reward, agent_id=agent_idx)
+                link_ap_sta[link]["tx_power_array"][ap] = tx_power
+                link_ap_sta[link]["tx_matrix"][ap, sta] = 1
+
+        # # Create the transmission matrix based on the sampled pairs
+        # tx_matrix = np.zeros(self.tx_matrix_shape, dtype=np.int32)
+        # tx_matrix[sharing_ap, designated_station] = 1
+   
+
+        # for ap, sta in zip(ap_group, sta_group):
+        #     tx_matrix[ap, sta] = 1
+
+        # return tx_matrix, tx_power
+
+        return link_ap_sta
