@@ -46,6 +46,7 @@ class MapcAgentFactory:
             agent_params_lvl3: dict = None,
             hierarchical: bool = True,
             tx_power_levels: int = 4,
+            n_links: int = 3,
             seed: int = 42
     ) -> None:
         self.associations = associations
@@ -55,6 +56,7 @@ class MapcAgentFactory:
         self.agent_params_lvl3 = agent_params_lvl3
         self.hierarchical = hierarchical
         self.tx_power_levels = tx_power_levels
+        self.n_links = n_links
         self.seed = seed
 
         np.random.seed(seed)
@@ -127,22 +129,45 @@ class MapcAgentFactory:
                 assign_stations[n].init(self.seed)
                 self.seed += 1
 
-        # Agent selecting tx power
-        select_tx_power = RLib(
-            agent_type=self.agent_type,
-            agent_params=self.agent_params_lvl3.copy(),
-            ext_type=BasicMab,
-            ext_params={'n_arms': self.tx_power_levels}
+        # link selection 
+        link_select_idx = 0
+        assign_links = RLib(
+            agent_type=self.agent_type, 
+            agent_params=self.agent_params_lvl3, 
+            ext_type=BasicMab, 
+            ext_params={"n_arms": ((2 ** self.n_links) - 1)}
         )
-        select_tx_power_dict = {}
-        idx = 0
+        assign_links_dict = {}
 
         for group in self._powerset(self.access_points):
             for sta in chain.from_iterable(self.associations[ap] for ap in group):
-                select_tx_power_dict[group, sta] = idx
-                idx += 1
-                select_tx_power.init(self.seed)
+                assign_links_dict[group, sta] = link_select_idx
+                assign_links.init(self.seed)
                 self.seed += 1
+                link_select_idx += 1
+        
+        # Agent selecting tx power
+        select_tx_power = {
+            link: RLib(
+                agent_type=self.agent_type,
+                agent_params=self.agent_params_lvl3.copy(),
+                ext_type=BasicMab,
+                ext_params={'n_arms': self.tx_power_levels}
+            ) for link in range(self.n_links)
+        }
+
+        select_tx_power_dict = {}
+        txp_agent_idx = defaultdict(int)
+
+        for group in self._powerset(self.access_points):
+            for sta in chain.from_iterable(self.associations[ap] for ap in group):
+                for link in range(self.n_links):
+                    idx = txp_agent_idx[link]
+                    txp_agent_idx[link]+=1 
+                    select_tx_power_dict[group, sta, link] = idx
+                    select_tx_power[link].init(self.seed)
+                    self.seed += 1
+
 
         return HierarchicalMapcAgent(
             associations=self.associations,
@@ -154,6 +179,7 @@ class MapcAgentFactory:
             select_tx_power_dict=select_tx_power_dict,
             ap_group_action_to_ap_group=self._ap_group_action_to_ap_group,
             sta_group_action_to_sta_group=self._sta_group_action_to_sta_group,
+            link_action_to_links_group=self._assign_links_agent_action_to_links_group,
             tx_matrix_shape=(self.n_nodes, self.n_nodes),
             tx_power_levels=self.tx_power_levels
         )
@@ -229,7 +255,31 @@ class MapcAgentFactory:
 
         s = sorted(list(iterable))
         return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
+    
+    @staticmethod
+    def _powerset_without_emptyset(iterable: Iterable) -> Iterable:
+        """
+        Returns the powerset of the given iterable. For example, the powerset of [1, 2, 3] is:
+        [(1,), (2,), (3,), (1, 2), (1, 3), (2, 3), (1, 2, 3)].
 
+        Parameters
+        ----------
+        iterable: Iterable
+            The iterable to compute the powerset.
+
+        Returns
+        -------
+        Iterable
+            The powerset of the given iterable.
+        """
+
+        s = sorted(list(iterable))
+        return chain.from_iterable(combinations(s, r) for r in range(1, len(s) + 1))
+
+    def _assign_links_agent_action_to_links_group(self, link_action):
+        links = range(self.n_links)
+        return tuple(self._powerset_without_emptyset(links))[link_action]
+    
     def _ap_group_action_to_ap_group(self, ap_group_action: int, sharing_ap: int) -> tuple[int]:
         """
         Translates the action of the agent to the list of APs which are sharing the channel.
@@ -249,6 +299,7 @@ class MapcAgentFactory:
 
         ap_set = set(self.access_points).difference({sharing_ap})
         return tuple(self._powerset(ap_set))[ap_group_action]
+
 
     def _sta_group_action_to_sta_group(self, sta_group_action: dict[int, int]) -> list[int]:
         """
