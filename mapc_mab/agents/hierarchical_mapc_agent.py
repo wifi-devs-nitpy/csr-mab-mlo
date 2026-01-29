@@ -156,7 +156,7 @@ class HierarchicalMapcAgent(MapcAgent):
             reward = self.rewards[self.assign_links_last_step[all_aps, sta]]
             self.assign_links_last_step[all_aps, sta] = self.step
             idx = self.assign_links_dict[all_aps, sta]
-            link_action = self.assign_links_agent.sample(reward, agent_id=idx)
+            link_action = self.assign_links_agent.sample(reward, agent_id=idx).item()
 
             #decode logic for the assign_links_agent_action_to_links
             links = self.link_action_to_link_group(link_action)
@@ -181,7 +181,7 @@ class HierarchicalMapcAgent(MapcAgent):
                 self.select_tx_power_last_step[link][all_aps, sta, link] = self.step
                 reward = self.rewards[reward_idx]
                 agent_idx = self.select_tx_power_dict[link][all_aps, sta, link]
-                tx_power = self.select_tx_power_agent[link].sample(reward, agent_id=agent_idx)
+                tx_power = self.select_tx_power_agent[link].sample(reward, agent_id=agent_idx).item()
                 link_ap_sta[link]["tx_power_array"][ap] = tx_power
                 link_ap_sta[link]["tx_matrix"][ap, sta] = 1
 
