@@ -53,7 +53,11 @@ def plot_network_scenario(
     n_ap = len(associations)
     bss_colors = mpl.colormaps['cool'](np.linspace(0, 1, n_ap + 2))[1:-1]
     ap_labels = string.ascii_uppercase
-
+    
+    # converting to numpy arrays bcz matplotlib cannot understand jax arrays 
+    pos = np.asarray(pos)
+    tx = np.array(tx) # convers to array(None, dtype=object) if tx is None, also tx == None holds true when checked.
+    
     fig, ax = plt.subplots(figsize=figsize)
 
     for i, ap in enumerate(associations):
@@ -112,9 +116,10 @@ def plot_network_scenario(
                 xytext=(pos[a, 0], pos[a, 1]),
                 arrowprops=dict(
                     arrowstyle="->",
-                    color="black",
-                    linewidth=1.5,
-                    alpha=0.8,
+                    color="#4A6FA5",
+                    linewidth=1.2,
+                    linestyle="dashed",
+                    alpha=0.75,
                     shrinkA=10,
                     shrinkB=10
                 ),
