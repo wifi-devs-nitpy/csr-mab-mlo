@@ -5,8 +5,8 @@ import jax
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax as tfp
 
-from mapc_sim.constants import *
-from mapc_sim.utils import logsumexp_db, default_path_loss
+from .constants import *
+from .utils import logsumexp_db, default_path_loss
 
 tfd = tfp.distributions
 
@@ -107,7 +107,14 @@ def network_data_rate(
     logit_success_prob = jnp.where(sinr > 0, logit_success_prob, -jnp.inf)
 
     n = jnp.round(DATA_RATES[channel_width][mcs] * 1e6 * TAU / FRAME_LEN)
-    frames_transmitted = tfd.Binomial(n, logit_success_prob).sample(seed=binomial_key)
+    
+    # replaced the tfd.binomail with -> jax.random.binomial
+    frames_transmitted = frames_transmitted = jax.random.binomial(
+            binomial_key,
+            n=n.astype(jnp.int32),
+            p=jax.nn.sigmoid(logit_success_prob)
+        )
+    
     average_data_rate = FRAME_LEN * (frames_transmitted / TAU)
     total_data_rate = average_data_rate.sum() / float(1e6)
 
