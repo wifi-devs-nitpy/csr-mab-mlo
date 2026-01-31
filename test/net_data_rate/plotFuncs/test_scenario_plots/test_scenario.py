@@ -1,5 +1,5 @@
 import numpy as np
-from secnario_plot import plot_network_scenario
+from ..plots_and_scenario_generators.scenario_plot import plot_network_scenario
 # Import the function you wrote
 # from your_module import plot_network_scenario
 import numpy as np
