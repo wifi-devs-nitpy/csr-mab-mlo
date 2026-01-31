@@ -3,6 +3,7 @@ import jax.numpy as jnp
 import numpy as np
 from jax.random import PRNGKey
 from chex import Array, Scalar
+from itertools import chain
 
 def random_scenario(
         n_ap: int = 4,
@@ -75,3 +76,27 @@ def random_scenario(
     pos = _draw_positions(jax.random.PRNGKey(seed))
 
     return associations, pos, tx
+
+def tx_matrix_generator(associations, seed=42):
+    # assuming that each aps have different number of stations
+    key = jax.random.PRNGKey(seed)
+
+    n_ap = len(associations.keys())
+    n_sta = len(list(chain.from_iterable(associations.values())))
+    n_nodes = n_ap + n_sta
+
+    tx_matrices = []
+
+    for _ in range(10):   
+        key, run_key = jax.random.split(key) 
+        tx = jnp.zeros((n_nodes, n_nodes))
+        
+        ap_sta_pairs = {
+                ap: jax.random.choice(run_key, jnp.asarray(associations[ap]), shape=(1,)).item() 
+                for ap in associations.keys()
+            }
+        
+        tx = tx.at[np.array(list(ap_sta_pairs.keys())), np.array(list(ap_sta_pairs.values()))].set(1)
+        tx_matrices.append(tx)     
+
+    return jnp.array(tx_matrices)
