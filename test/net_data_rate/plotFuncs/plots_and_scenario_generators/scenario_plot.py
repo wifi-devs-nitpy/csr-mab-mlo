@@ -56,7 +56,6 @@ def plot_network_scenario(
     
     # converting to numpy arrays bcz matplotlib cannot understand jax arrays 
     pos = np.asarray(pos)
-    tx = np.array(tx) # convers to array(None, dtype=object) if tx is None, also tx == None holds true when checked.
     
     fig, ax = plt.subplots(figsize=figsize)
 
@@ -107,6 +106,7 @@ def plot_network_scenario(
             )
 
     if tx is not None:
+        tx = np.asarray(tx)
         tx_src, tx_dst = np.where(tx == 1)
 
         for a, b in zip(tx_src, tx_dst):
