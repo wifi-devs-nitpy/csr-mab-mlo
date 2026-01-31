@@ -3,7 +3,7 @@ from functools import partial
 import jax
 import jax.numpy as jnp
 
-from mapc_sim.constants import *
+from .constants import *
 
 
 def tgax_path_loss(distance: jax.Array, walls: jax.Array, breaking_point: jax.Array, wall_loss: jax.Array) -> jax.Array:
