@@ -25,10 +25,10 @@ def network_data_rate(
         key: jax.random.PRNGKey,
         tx: jax.Array,
         pos: jax.Array,
-        mcs: jax.Array | None,
         tx_power: jax.Array,
-        sigma: float,
         walls: jax.Array,
+        mcs: jax.Array | None = None,
+        sigma: float = DEFAULT_SIGMA,
         channel_width: int = 20,
         return_internals: bool = False,
         path_loss_fn: Callable = default_path_loss
