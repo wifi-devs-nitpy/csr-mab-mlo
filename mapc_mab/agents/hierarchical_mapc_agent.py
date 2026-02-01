@@ -16,8 +16,9 @@ class HierarchicalMapcAgent(MapcAgent):
     The agent consists of three phases:
 
       1. Selection of the group of APs which are sharing the channel.
-      2. Selection of the transmission power for each AP in the group.
-      3. Selection of the stations which are served simultaneously by the APs in the group.
+      2. Selection of the stations which are served simultaneously by the APs in the group.
+      3. selection of the links used by a station
+      2. Selection of the transmission power for each ap-sta link in the group.
 
     Parameters
     ----------
@@ -31,10 +32,10 @@ class HierarchicalMapcAgent(MapcAgent):
         The agents which select the stations served by the APs.
     assign_stations_dict : dict[tuple[tuple, int], tuple[int, int]]
         The dictionary which maps the station and the group of APs to the agent index.
-    select_tx_power_agent : RLib
-        The agent which selects the transmission power.
-    select_tx_power_dict : dict[tuple[tuple, int], int]
-        The dictionary which maps the group of APs and the served station to the agent index.
+    select_tx_power_agent : dict[int, RLib]
+        The agent which selects the transmission power for a particular link.
+    select_tx_power_dict : dict[tuple[tuple, int, int], int]
+        The dictionary which maps the group of APs, served station and link to the agent index.
     ap_group_action_to_ap_group : Callable
         The function which translates the action of the agent to the tuple of APs sharing the channel.
     sta_group_action_to_sta_group : Callable
@@ -54,7 +55,7 @@ class HierarchicalMapcAgent(MapcAgent):
             assign_stations_dict: dict[tuple[tuple, int], tuple[int, int]],
 
             assign_links_agent: RLib,
-            assign_links_dict: dict[tuple[tuple, int], int],
+            assign_links_dict: dict[tuple[tuple, int, int], int],
 
             select_tx_power_agent: dict[int, RLib],
             select_tx_power_dict: dict[tuple[tuple, int, int], int],
@@ -135,21 +136,21 @@ class HierarchicalMapcAgent(MapcAgent):
         link_ap_sta = {
             0: {
                 "ap_sta_pairs": [], 
-                "tx_power_array": np.zeros(self.n_nodes, dtype=np.int32), 
+                "tx_power_indices": np.zeros(self.n_nodes, dtype=np.int32), 
                 "tx_matrix": np.zeros((self.n_nodes, self.n_nodes))
             }, 
             1: {
                 "ap_sta_pairs": [], 
-                "tx_power_array": np.zeros(self.n_nodes, dtype=np.int32), 
+                "tx_power_indices": np.zeros(self.n_nodes, dtype=np.int32), 
                 "tx_matrix": np.zeros((self.n_nodes, self.n_nodes))
             }, 
             2: {
                 "ap_sta_pairs": [], 
-                "tx_power_array": np.zeros(self.n_nodes, dtype=np.int32), 
+                "tx_power_indices": np.zeros(self.n_nodes, dtype=np.int32), 
                 "tx_matrix": np.zeros((self.n_nodes, self.n_nodes))
             }
         }
-        # the above dictionary will be minified later, by not violating the DRY rule
+        # the above dictionary will be modified later, by not violating the DRY rule
 
         # sampling the links
         for i, (ap, sta) in enumerate(zip(all_aps, all_stas)):
@@ -180,9 +181,9 @@ class HierarchicalMapcAgent(MapcAgent):
                 reward_idx = self.select_tx_power_last_step[link][all_aps, sta, link]
                 self.select_tx_power_last_step[link][all_aps, sta, link] = self.step
                 reward = self.rewards[reward_idx]
-                agent_idx = self.select_tx_power_dict[link][all_aps, sta, link]
+                agent_idx = self.select_tx_power_dict[all_aps, sta, link]
                 tx_power = self.select_tx_power_agent[link].sample(reward, agent_id=agent_idx).item()
-                link_ap_sta[link]["tx_power_array"][ap] = tx_power
+                link_ap_sta[link]["tx_power_indices"][ap] = tx_power
                 link_ap_sta[link]["tx_matrix"][ap, sta] = 1
 
         # # Create the transmission matrix based on the sampled pairs
