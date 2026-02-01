@@ -6,7 +6,7 @@ import jax.numpy as jnp
 from .constants import *
 
 
-def tgax_path_loss(distance: jax.Array, walls: jax.Array, breaking_point: jax.Array, wall_loss: jax.Array) -> jax.Array:
+def tgax_path_loss(distance: jax.Array, walls: jax.Array, breaking_point: jax.Array, wall_loss: jax.Array, central_frequency: float = DEFAULT_CENTRAL_FREQUENCY) -> jax.Array:
     r"""
     Calculates the path loss according to the TGax channel model [1]_.
 
@@ -32,13 +32,19 @@ def tgax_path_loss(distance: jax.Array, walls: jax.Array, breaking_point: jax.Ar
     """
 
     distance = jnp.clip(distance, REFERENCE_DISTANCE, None)
-    return (40.05 + 20 * jnp.log10((jnp.minimum(distance, breaking_point) * CENTRAL_FREQUENCY) / 2.4) +
+    return (40.05 + 20 * jnp.log10((jnp.minimum(distance, breaking_point) * central_frequency) / 2.4) +
             (distance > breaking_point) * 35 * jnp.log10(distance / breaking_point) + wall_loss * walls)
 
 
 residential_tgax_path_loss = partial(tgax_path_loss, breaking_point=RESIDENTIAL_BREAKING_POINT, wall_loss=RESIDENTIAL_WALL_LOSS)
 enterprise_tgax_path_loss = partial(tgax_path_loss, breaking_point=ENTERPRISE_BREAKING_POINT, wall_loss=ENTERPRISE_WALL_LOSS)
+
 default_path_loss = enterprise_tgax_path_loss
+
+path_loss_2g = partial(enterprise_tgax_path_loss, central_frequency=2.412)
+path_loss_5g = partial(enterprise_tgax_path_loss, central_frequency=5.260)
+path_loss_6g = partial(enterprise_tgax_path_loss, central_frequency=6.035) 
+
 
 
 def logsumexp_db(a: jax.Array, b: jax.Array) -> jax.Array:
