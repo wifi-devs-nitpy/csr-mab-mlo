@@ -29,6 +29,8 @@ class MapcAgentFactory:
         The parameters of the second level agent.
     agent_params_lvl3 : dict
         The parameters of the third level agent.
+    agent_params_lvl4 : dict
+        The parameters of the Fourth level agent.
     hierarchical : bool
         The flag indicating whether the hierarchical or flat MAPC agent should be created.
     tx_power_levels : int
@@ -44,6 +46,7 @@ class MapcAgentFactory:
             agent_params_lvl1: dict,
             agent_params_lvl2: dict = None,
             agent_params_lvl3: dict = None,
+            agent_params_lvl4: dict = None,
             hierarchical: bool = True,
             tx_power_levels: int = 4,
             n_links: int = 3,
@@ -54,6 +57,7 @@ class MapcAgentFactory:
         self.agent_params_lvl1 = agent_params_lvl1
         self.agent_params_lvl2 = agent_params_lvl2
         self.agent_params_lvl3 = agent_params_lvl3
+        self.agent_params_lvl4 = agent_params_lvl4
         self.hierarchical = hierarchical
         self.tx_power_levels = tx_power_levels
         self.n_links = n_links
@@ -150,7 +154,7 @@ class MapcAgentFactory:
         select_tx_power = {
             link: RLib(
                 agent_type=self.agent_type,
-                agent_params=self.agent_params_lvl3.copy(),
+                agent_params=self.agent_params_lvl4.copy(),
                 ext_type=BasicMab,
                 ext_params={'n_arms': self.tx_power_levels}
             ) for link in range(self.n_links)
@@ -163,7 +167,7 @@ class MapcAgentFactory:
             for sta in chain.from_iterable(self.associations[ap] for ap in group):
                 for link in range(self.n_links):
                     idx = txp_agent_idx[link]
-                    txp_agent_idx[link]+=1 
+                    txp_agent_idx[link] += 1 
                     select_tx_power_dict[group, sta, link] = idx
                     select_tx_power[link].init(self.seed)
                     self.seed += 1
