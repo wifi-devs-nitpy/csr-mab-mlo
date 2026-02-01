@@ -20,6 +20,7 @@ def tgax_path_loss(distance: jax.Array, walls: jax.Array, breaking_point: jax.Ar
         Breaking point of the path loss model
     wall_loss: Array
         Wall loss factor
+    central_frequency: float
 
     Returns
     -------

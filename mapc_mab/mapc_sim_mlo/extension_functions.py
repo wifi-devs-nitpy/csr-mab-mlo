@@ -22,7 +22,7 @@ def compute_throughput_for_scenario(tx, pos, seed=42):
 
     return jnp.asarray(throughput).mean()
 
-def _tx_power_indices_to_tx_power(tx_power_indices, n_tx_power_levels, min_tx_power, max_tx_power):
-    tx_powers = np.linspace(min_tx_power, max_tx_power, n_tx_power_levels)
+def tx_power_indices_to_tx_power(tx_power_indices, n_tx_power_levels, min_tx_power, max_tx_power):
+    tx_powers = jnp.linspace(min_tx_power, max_tx_power, n_tx_power_levels)
     tx_power_array = tx_powers[tx_power_indices]
     return tx_power_array   

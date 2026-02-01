@@ -44,9 +44,9 @@ class MapcAgentFactory:
             associations: dict[int, list[int]],
             agent_type: BaseAgent,
             agent_params_lvl1: dict,
-            agent_params_lvl2: dict = None,
-            agent_params_lvl3: dict = None,
-            agent_params_lvl4: dict = None,
+            agent_params_lvl2: dict,
+            agent_params_lvl3: dict,
+            agent_params_lvl4: dict,
             hierarchical: bool = True,
             tx_power_levels: int = 4,
             n_links: int = 3,
@@ -137,7 +137,7 @@ class MapcAgentFactory:
         link_select_idx = 0
         assign_links = RLib(
             agent_type=self.agent_type, 
-            agent_params=self.agent_params_lvl3, 
+            agent_params=self.agent_params_lvl3.copy(), 
             ext_type=BasicMab, 
             ext_params={"n_arms": ((2 ** self.n_links) - 1)}
         )

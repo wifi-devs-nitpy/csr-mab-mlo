@@ -18,7 +18,7 @@ class HierarchicalMapcAgent(MapcAgent):
       1. Selection of the group of APs which are sharing the channel.
       2. Selection of the stations which are served simultaneously by the APs in the group.
       3. selection of the links used by a station
-      2. Selection of the transmission power for each ap-sta link in the group.
+      4. Selection of the transmission power for each ap-sta link in the group.
 
     Parameters
     ----------
