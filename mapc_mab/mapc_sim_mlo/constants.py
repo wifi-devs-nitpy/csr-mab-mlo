@@ -19,7 +19,7 @@ DEFAULT_SIGMA = 2.
 r"""Simulation parameter 
 https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=908165"""
 
-CENTRAL_FREQUENCY = 5.160
+DEFAULT_CENTRAL_FREQUENCY = 5.160
 r"""Simulation parameter (GHz) 
 https://en.wikipedia.org/wiki/List_of_WLAN_channels#5_GHz_(802.11a/h/n/ac/ax)"""
 
@@ -57,5 +57,11 @@ MEAN_SNRS = {
     160: jnp.array([11.492, 11.342, 12.263, 14.681, 17.739, 21.901, 23.215, 24.481, 28.421, 29.906, 37.386, 39.310, 43.131, 45.163])
 }
 STD_SNR = 1.6
+
 r"""Parameters of the success probability curves - cdf of the normal distribution with standard deviation of 1.6
 (derived from ns-3 simulations with Nakagami fading)"""
+
+
+CHANNEL_WIDTH_2G = 20
+CHANNEL_WIDTH_5G = 40
+CHANNEL_WIDTH_6G = 80
