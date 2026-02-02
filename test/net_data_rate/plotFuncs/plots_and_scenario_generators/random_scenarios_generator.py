@@ -7,7 +7,7 @@ from itertools import chain
 
 def random_scenario(
         n_ap: int = 4,
-        d_ap: Scalar = 80.,
+        d_ap: Scalar = 50.,
         min_sep: int = 40, 
         n_sta_per_ap: int = 10,
         d_sta: Scalar = None,
@@ -76,6 +76,37 @@ def random_scenario(
     pos = _draw_positions(jax.random.PRNGKey(seed))
 
     return associations, pos, tx
+
+def draw_sta_positions_with_aps(ap_pos: Array, ap_sta_dist: Scalar, n_stas: int, seed: int = 42):
+    """
+    Generates random positions for stations (STAs) around each access point (AP).
+
+    Parameters
+    -----------
+    ap_pos: Array
+        Array of AP positions with shape (num_aps, 2).
+    ap_sta_dist: Scalar
+        Maximum distance from AP within which STAs can be placed.
+    associations: dict[int, int]
+        Dictionary mapping AP indices to the number of associated STAs.
+    seed: int, optional
+        Random seed for reproducibility. Defaults to 42.
+    
+    Returns
+    ----------
+        Array: Array of positions for APs and STAs with shape (num_aps + total_stas, 2).
+    """
+    key = jax.random.PRNGKey(seed)
+    
+    sta_pos = []
+    for i, pos in enumerate(ap_pos):
+        key, run_key = jax.random.split(key) 
+        center = jnp.repeat(jnp.asarray(pos)[None, :], n_stas, axis=0)
+        ap_sta_positions = center + (jax.random.uniform(run_key, (n_stas, 2), dtype=jnp.float32) - 0.5) * 2 * ap_sta_dist 
+        sta_pos += ap_sta_positions.tolist()
+
+    return jnp.concatenate([jnp.asarray(ap_pos), jnp.asarray(sta_pos)], axis=0)
+
 
 def tx_matrix_generator(associations, seed=42):
     # assuming that each aps have different number of stations
