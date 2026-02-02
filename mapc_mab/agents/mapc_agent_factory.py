@@ -179,6 +179,8 @@ class MapcAgentFactory:
             find_groups_dict=find_groups_dict,
             assign_stations_agents=assign_stations,
             assign_stations_dict=assign_stations_dict,
+            assign_links_agent=assign_links, 
+            assign_links_dict=assign_links_dict,
             select_tx_power_agent=select_tx_power,
             select_tx_power_dict=select_tx_power_dict,
             ap_group_action_to_ap_group=self._ap_group_action_to_ap_group,

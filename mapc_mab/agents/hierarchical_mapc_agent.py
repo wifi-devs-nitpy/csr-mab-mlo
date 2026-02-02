@@ -40,7 +40,7 @@ class HierarchicalMapcAgent(MapcAgent):
         The function which translates the action of the agent to the tuple of APs sharing the channel.
     sta_group_action_to_sta_group : Callable
         The function which translates the action of the agent to the list of served stations.
-    link_action_to_link_group: Callable
+    link_action_to_links_group: Callable
         The function which translate the link action of the agent to the list of links that the station uses
     tx_matrix_shape : Shape
         The shape of the transmission matrix.
@@ -60,7 +60,7 @@ class HierarchicalMapcAgent(MapcAgent):
             select_tx_power_agent: dict[int, RLib],
             select_tx_power_dict: dict[tuple[tuple, int, int], int],
 
-            link_action_to_link_group: Callable,
+            link_action_to_links_group: Callable,
             ap_group_action_to_ap_group: Callable,
             sta_group_action_to_sta_group: Callable,
             tx_matrix_shape: Shape,
@@ -87,7 +87,7 @@ class HierarchicalMapcAgent(MapcAgent):
 
         self.ap_group_action_to_ap_group = ap_group_action_to_ap_group
         self.sta_group_action_to_sta_group = sta_group_action_to_sta_group
-        self.link_action_to_link_group = link_action_to_link_group
+        self.link_action_to_links_group = link_action_to_links_group
         self.tx_matrix_shape = tx_matrix_shape
         self.tx_power_levels = tx_power_levels
 
@@ -160,7 +160,7 @@ class HierarchicalMapcAgent(MapcAgent):
             link_action = self.assign_links_agent.sample(reward, agent_id=idx).item()
 
             #decode logic for the assign_links_agent_action_to_links
-            links = self.link_action_to_link_group(link_action)
+            links = self.link_action_to_links_group(link_action)
 
             # links is a tuple for that particular station 
             for link in links: 
