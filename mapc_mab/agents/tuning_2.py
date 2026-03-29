@@ -155,7 +155,7 @@ if __name__ == '__main__':
         load_if_exists=True,
         direction='maximize',
         sampler=optuna.samplers.TPESampler(seed=args.seed), 
-        pruner=optuna.pruners.HyperbandPruner(min_resource=6, max_resource=24, reduction_factor=3)
+        pruner=optuna.pruners.HyperbandPruner(min_resource=3, max_resource=7, reduction_factor=3)
     )
 
     study.optimize(
