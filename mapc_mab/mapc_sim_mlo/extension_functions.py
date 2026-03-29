@@ -11,7 +11,7 @@ def compute_throughput_for_scenario(tx, pos, seed=42):
     tx_power_array = jnp.ones((pos.shape[0],), dtype=jnp.float32) * DEFAULT_TX_POWER 
     walls = jnp.zeros(tx.shape, dtype=float)
     
-    data_rate_func_fast = jax.jit(partial(network_data_rate, tx=tx, pos=pos, mcs=None, tx_power=tx_power_array, sigma=DEFAULT_SIGMA, walls=walls))
+    data_rate_func_fast = jax.jit(partial(network_data_rate, tx=tx, pos=pos, mcs=11, tx_power=tx_power_array, sigma=DEFAULT_SIGMA, walls=walls))
 
     throughput = []
 
