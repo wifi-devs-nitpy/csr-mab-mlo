@@ -6,7 +6,7 @@ import jax.numpy as jnp
 from chex import Array, Scalar, PRNGKey
 from mapc_sim.constants import DEFAULT_TX_POWER, DEFAULT_SIGMA, DATA_RATES
 from mapc_sim.sim import network_data_rate
-
+from mapc_mab.mapc_sim_mlo.mlo_data_rate import network_data_rate_mlo
 from mapc_mab.envs.scenario import Scenario
 from mapc_mab.envs.static_scenarios import StaticScenario
 
@@ -75,7 +75,7 @@ class DynamicScenario(Scenario):
             switch_steps = []
 
         self.data_rate_fn_first = jax.jit(partial(
-            network_data_rate,
+            network_data_rate_mlo,
             pos=pos,
             mcs=jnp.full(pos.shape[0], mcs, dtype=jnp.int32),
             sigma=sigma,
@@ -96,7 +96,7 @@ class DynamicScenario(Scenario):
             walls_sec = walls.copy()
 
         self.data_rate_fn_sec = jax.jit(partial(
-            network_data_rate,
+            network_data_rate_mlo,
             pos=pos_sec,
             mcs=jnp.full(pos_sec.shape[0], mcs_sec, dtype=jnp.int32),
             sigma=sigma_sec,
@@ -112,7 +112,7 @@ class DynamicScenario(Scenario):
         self.step = 0
         self.tx_power_delta = tx_power_delta
 
-    def __call__(self, key: PRNGKey, tx: Array, tx_power: Array) -> tuple[Scalar, Scalar]:
+    def __call__(self, key: PRNGKey, link_ap_sta) -> tuple[Scalar, Scalar]:
         if tx_power is None:
             tx_power = jnp.zeros(self.pos.shape[0])
 
@@ -121,9 +121,9 @@ class DynamicScenario(Scenario):
 
         self.step += 1
 
-        thr = self.data_rate_fn(key, tx, tx_power=self.tx_power - self.tx_power_delta * tx_power)
-        reward = thr / DATA_RATES[self.mcs]
-        return thr, reward
+        thr = self.data_rate_fn(key=key, link_ap_sta=link_ap_sta)
+        reward = thr 
+        return thr
 
     def reset(self) -> None:
         self.data_rate_fn = self.data_rate_fn_first

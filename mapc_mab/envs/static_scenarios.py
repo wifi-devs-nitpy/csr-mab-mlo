@@ -5,7 +5,7 @@ import jax
 import jax.numpy as jnp
 from chex import Array, Scalar, PRNGKey
 from mapc_sim.constants import DEFAULT_TX_POWER, DEFAULT_SIGMA
-from mapc_sim.sim import network_data_rate
+from mapc_mab.mapc_sim_mlo.mlo_data_rate import network_data_rate_mlo 
 
 from mapc_mab.envs.scenario import Scenario
 
@@ -60,20 +60,16 @@ class StaticScenario(Scenario):
         self.walls_pos = walls_pos
 
         self.data_rate_fn = jax.jit(partial(
-            network_data_rate,
+            network_data_rate_mlo,
             pos=self.pos,
             mcs=jnp.full(pos.shape[0], mcs, dtype=jnp.int32),
             sigma=self.sigma,
             walls=self.walls
         ))
 
-    def __call__(self, key: PRNGKey, tx: Array, tx_power: Optional[Array] = None) -> tuple[Scalar, Scalar]:
-        if tx_power is None:
-            tx_power = jnp.zeros(self.pos.shape[0])
-
-        thr = self.data_rate_fn(key, tx, tx_power=self.tx_power - self.tx_power_delta * tx_power)
-        reward = thr / DATA_RATES[self.mcs]
-        return thr, reward
+    def __call__(self, key: PRNGKey, link_ap_sta: dict[str: jax.Array]) -> tuple[Scalar, Scalar]:
+        thr = self.data_rate_fn(key=key, link_ap_sta=link_ap_sta)
+        return thr
 
     def plot(self, filename: str = None) -> None:
         super().plot(self.pos, filename, self.walls_pos)

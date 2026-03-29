@@ -20,7 +20,6 @@ from mapc_mab.mapc_sim_mlo.constants import (
 
 
 class MapcAgentFactoryTestCase(unittest.TestCase):
-
     def test_hierarchical_agent_4level_with_mlo(self):
         """Test 4-level hierarchical agent (with TX power control - Level 4) with MLO simulation"""
         key = jax.random.PRNGKey(42)
