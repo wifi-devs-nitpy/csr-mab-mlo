@@ -113,16 +113,12 @@ class DynamicScenario(Scenario):
         self.tx_power_delta = tx_power_delta
 
     def __call__(self, key: PRNGKey, link_ap_sta) -> tuple[Scalar, Scalar]:
-        if tx_power is None:
-            tx_power = jnp.zeros(self.pos.shape[0])
-
         if self.step in self.switch_steps:
             self.switch()
 
         self.step += 1
 
         thr = self.data_rate_fn(key=key, link_ap_sta=link_ap_sta)
-        reward = thr 
         return thr
 
     def reset(self) -> None:

@@ -12,7 +12,6 @@ import optuna
 from reinforced_lib.agents.mab import *
 
 from mapc_mab.agents import MapcAgentFactory
-from mapc_mab.envs.run import run_scenario
 from mapc_mab.envs.dynamic_scenarios import random_scenario
 
 import jax 
@@ -20,30 +19,30 @@ from mapc_mab.envs.static_scenarios import Scenario
 
 
 TRAINING_SCENARIOS = [
-    (random_scenario(seed=1, d_ap=75., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500), 500),
-    (random_scenario(seed=2, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000), 1000),
-    (random_scenario(seed=3, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500), 500),
-    (random_scenario(seed=4, d_ap=75., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000), 2000),
-    (random_scenario(seed=5, d_ap=75., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500), 500),
-    (random_scenario(seed=6, d_ap=75., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000), 3000),
-    (random_scenario(seed=7, d_ap=75., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500), 500),
-    (random_scenario(seed=8, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000), 1000),
-    (random_scenario(seed=9, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500), 500),
-    (random_scenario(seed=10, d_ap=75., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000), 2000),
-    (random_scenario(seed=11, d_ap=75., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500), 500),
-    (random_scenario(seed=12, d_ap=75., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000), 3000),
-    (random_scenario(seed=13, d_ap=75., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500), 500),
-    (random_scenario(seed=14, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000), 1000),
-    (random_scenario(seed=15, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500), 500),
-    (random_scenario(seed=16, d_ap=75., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000), 2000),
-    (random_scenario(seed=17, d_ap=75., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500), 500),
-    (random_scenario(seed=18, d_ap=75., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000), 3000),
-    (random_scenario(seed=19, d_ap=75., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500), 500),
-    (random_scenario(seed=20, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000), 1000),
-    (random_scenario(seed=21, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500), 500),
-    (random_scenario(seed=22, d_ap=75., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000), 2000),
-    (random_scenario(seed=23, d_ap=75., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500), 500),
-    (random_scenario(seed=24, d_ap=75., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000), 3000)
+    (random_scenario(seed=1, d_ap=75., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500*2), 500*2),
+    (random_scenario(seed=2, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000*2), 1000*2),
+    (random_scenario(seed=3, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500*2), 500*2),
+    (random_scenario(seed=4, d_ap=75., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000*2), 2000*2),
+    (random_scenario(seed=5, d_ap=75., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500*2), 500*2),
+    (random_scenario(seed=6, d_ap=75., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000*2), 3000*2),
+    (random_scenario(seed=7, d_ap=75., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500*2), 500*2),
+    (random_scenario(seed=8, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000*2), 1000*2),
+    (random_scenario(seed=9, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500*2), 500*2),
+    (random_scenario(seed=10, d_ap=75., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000*2), 2000*2),
+    (random_scenario(seed=11, d_ap=75., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500*2), 500*2),
+    (random_scenario(seed=12, d_ap=75., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000*2), 3000*2),
+    (random_scenario(seed=13, d_ap=75., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500*2), 500*2),
+    (random_scenario(seed=14, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000*2), 1000*2),
+    (random_scenario(seed=15, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500*2), 500*2),
+    (random_scenario(seed=16, d_ap=75., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000*2), 2000*2),
+    (random_scenario(seed=17, d_ap=75., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500*2), 500*2),
+    (random_scenario(seed=18, d_ap=75., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000*2), 3000*2),
+    (random_scenario(seed=19, d_ap=75., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500*2), 500*2),
+    (random_scenario(seed=20, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000*2), 1000*2),
+    (random_scenario(seed=21, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500*2), 500*2),
+    (random_scenario(seed=22, d_ap=75., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000*2), 2000*2),
+    (random_scenario(seed=23, d_ap=75., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500*2), 500*2),
+    (random_scenario(seed=24, d_ap=75., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000*2), 3000*2)
 ]
 
 SLOTS_AHEAD = 1
@@ -70,9 +69,9 @@ def run_scenario(
         for _ in range(n_steps):
             key, scenario_key = jax.random.split(key)
             link_ap_sta = agent.sample(reward)
-            data_rate, reward = scenario(scenario_key, tx_matrix, tx_power)
+            data_rate = scenario(key=scenario_key, link_ap_sta=link_ap_sta)
             runs[-1].append(data_rate.item())
-            actions[-1].append(scenario.tx_matrix_to_action(tx_matrix))
+            actions[-1].append(link_ap_sta)
 
     return runs, actions
 
@@ -91,6 +90,8 @@ def objective(trial: optuna.Trial, agent: str, hierarchical: bool, seed: int) ->
         if hierarchical:
             agent_params_lvl2 = suggest_params(2)
             agent_params_lvl3 = suggest_params(3)
+            agent_params_lvl4 = suggest_params(4)
+
 
     elif agent == 'Softmax':
         def suggest_params(level):
@@ -105,6 +106,7 @@ def objective(trial: optuna.Trial, agent: str, hierarchical: bool, seed: int) ->
         if hierarchical:
             agent_params_lvl2 = suggest_params(2)
             agent_params_lvl3 = suggest_params(3)
+            agent_params_lvl4 = suggest_params(4)
 
     elif agent == 'UCB':
         def suggest_params(level):
@@ -118,6 +120,7 @@ def objective(trial: optuna.Trial, agent: str, hierarchical: bool, seed: int) ->
         if hierarchical:
             agent_params_lvl2 = suggest_params(2)
             agent_params_lvl3 = suggest_params(3)
+            agent_params_lvl4 = suggest_params(4)
 
     elif agent == 'NormalThompsonSampling':
         def suggest_params(level):
@@ -133,7 +136,7 @@ def objective(trial: optuna.Trial, agent: str, hierarchical: bool, seed: int) ->
         if hierarchical:
             agent_params_lvl2 = suggest_params(2)
             agent_params_lvl3 = suggest_params(3)
-
+            agent_params_lvl4 = suggest_params(4)
     else:
         raise ValueError(f'Unknown agent {agent}')
 
@@ -141,7 +144,7 @@ def objective(trial: optuna.Trial, agent: str, hierarchical: bool, seed: int) ->
 
     for step, (scenario, n_steps) in enumerate(TRAINING_SCENARIOS):
         if hierarchical:
-            agent_factory = MapcAgentFactory(scenario.associations, agent_type, agent_params_lvl1, agent_params_lvl2, agent_params_lvl3, hierarchical=True, seed=seed)
+            agent_factory = MapcAgentFactory(scenario.associations, agent_type, agent_params_lvl1, agent_params_lvl2, agent_params_lvl3, agent_params_lvl4, hierarchical=True, seed=seed)
         else:
             agent_factory = MapcAgentFactory(scenario.associations, agent_type, agent_params_lvl1, hierarchical=False, seed=seed)
 
@@ -149,6 +152,8 @@ def objective(trial: optuna.Trial, agent: str, hierarchical: bool, seed: int) ->
         runs.append(results)
 
         trial.report(results, step)
+        if trial.should_prune():
+            raise optuna.TrialPruned()
 
     return np.mean(runs)
 
@@ -167,7 +172,8 @@ if __name__ == '__main__':
         study_name=args.agent,
         load_if_exists=True,
         direction='maximize',
-        sampler=optuna.samplers.TPESampler(seed=args.seed)
+        sampler=optuna.samplers.TPESampler(seed=args.seed), 
+        pruner=optuna.pruners.HyperbandPruner(min_resource=6, max_resource=24, reduction_factor=3)
     )
 
     study.optimize(
