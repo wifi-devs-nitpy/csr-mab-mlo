@@ -25,24 +25,6 @@ TRAINING_SCENARIOS = [
     (random_scenario(seed=4, d_ap=75., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000*2), 2000*2),
     (random_scenario(seed=5, d_ap=75., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500*2), 500*2),
     (random_scenario(seed=6, d_ap=75., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000*2), 3000*2),
-    (random_scenario(seed=7, d_ap=75., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500*2), 500*2),
-    (random_scenario(seed=8, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000*2), 1000*2),
-    (random_scenario(seed=9, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500*2), 500*2),
-    (random_scenario(seed=10, d_ap=75., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000*2), 2000*2),
-    (random_scenario(seed=11, d_ap=75., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500*2), 500*2),
-    (random_scenario(seed=12, d_ap=75., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000*2), 3000*2),
-    (random_scenario(seed=13, d_ap=75., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500*2), 500*2),
-    (random_scenario(seed=14, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000*2), 1000*2),
-    (random_scenario(seed=15, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500*2), 500*2),
-    (random_scenario(seed=16, d_ap=75., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000*2), 2000*2),
-    (random_scenario(seed=17, d_ap=75., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500*2), 500*2),
-    (random_scenario(seed=18, d_ap=75., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000*2), 3000*2),
-    (random_scenario(seed=19, d_ap=75., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500*2), 500*2),
-    (random_scenario(seed=20, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000*2), 1000*2),
-    (random_scenario(seed=21, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500*2), 500*2),
-    (random_scenario(seed=22, d_ap=75., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000*2), 2000*2),
-    (random_scenario(seed=23, d_ap=75., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500*2), 500*2),
-    (random_scenario(seed=24, d_ap=75., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000*2), 3000*2)
 ]
 
 SLOTS_AHEAD = 1
@@ -71,7 +53,7 @@ def run_scenario(
             link_ap_sta = agent.sample(reward)
             data_rate = scenario(key=scenario_key, link_ap_sta=link_ap_sta)
             runs[-1].append(data_rate.item())
-            actions[-1].append(link_ap_sta)
+
 
     return runs, actions
 
