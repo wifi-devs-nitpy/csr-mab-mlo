@@ -161,6 +161,6 @@ if __name__ == '__main__':
     study.optimize(
         partial(objective, agent=args.agent, hierarchical=not args.flat, seed=args.seed),
         n_trials=args.n_trials,
-        n_jobs=-1,
+        n_jobs=10, # the script was executed on a 20 core thinkpad workstation, change the cores according to the requiement
         show_progress_bar=True
     )
