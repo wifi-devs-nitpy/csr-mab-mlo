@@ -101,7 +101,9 @@ def network_data_rate(
     if mcs is None:
         expected_data_rate = DATA_RATES[channel_width][:, None] * tfd.Normal(MEAN_SNRS[channel_width][:, None], STD_SNR).cdf(sinr)
         mcs = jnp.argmax(expected_data_rate, axis=0)
-
+    
+    mcs = jnp.asarray(mcs, dtype=jnp.int32)
+    
     sdist = tfd.Normal(MEAN_SNRS[channel_width][mcs], STD_SNR)
     logit_success_prob = sdist.log_cdf(sinr) - sdist.log_survival_function(sinr)
     logit_success_prob = jnp.where(sinr > 0, logit_success_prob, -jnp.inf)
