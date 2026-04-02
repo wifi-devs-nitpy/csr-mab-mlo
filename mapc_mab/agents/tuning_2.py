@@ -19,12 +19,30 @@ from mapc_mab.envs.static_scenarios import Scenario
 
 
 TRAINING_SCENARIOS = [
-    (random_scenario(seed=1, d_ap=75., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500*2), 500*2),
-    (random_scenario(seed=2, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000*2), 1000*2),
-    (random_scenario(seed=3, d_ap=75., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500*2), 500*2),
-    (random_scenario(seed=4, d_ap=75., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000*2), 2000*2),
-    (random_scenario(seed=5, d_ap=75., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500*2), 500*2),
-    (random_scenario(seed=6, d_ap=75., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000*2), 3000*2),
+    (random_scenario(seed=1, d_ap=20., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500*2), 500*2),
+    (random_scenario(seed=2, d_ap=20., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000*2), 1000*2),
+    (random_scenario(seed=3, d_ap=20., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500*2), 500*2),
+    (random_scenario(seed=4, d_ap=20., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000*2), 2000*2),
+    (random_scenario(seed=5, d_ap=20., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500*2), 500*2),
+    (random_scenario(seed=6, d_ap=20., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000*2), 3000*2),
+    (random_scenario(seed=1, d_ap=30., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500*2), 500*2),
+    (random_scenario(seed=2, d_ap=30., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000*2), 1000*2),
+    (random_scenario(seed=3, d_ap=30., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500*2), 500*2),
+    (random_scenario(seed=4, d_ap=30., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000*2), 2000*2),
+    (random_scenario(seed=5, d_ap=30., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500*2), 500*2),
+    (random_scenario(seed=6, d_ap=30., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000*2), 3000*2),
+    (random_scenario(seed=1, d_ap=50., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500*2), 500*2),
+    (random_scenario(seed=2, d_ap=50., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000*2), 1000*2),
+    (random_scenario(seed=3, d_ap=50., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500*2), 500*2),
+    (random_scenario(seed=4, d_ap=50., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000*2), 2000*2),
+    (random_scenario(seed=5, d_ap=50., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500*2), 500*2),
+    (random_scenario(seed=6, d_ap=50., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000*2), 3000*2),
+    (random_scenario(seed=1, d_ap=60., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500*2), 500*2),
+    (random_scenario(seed=2, d_ap=60., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000*2), 1000*2),
+    (random_scenario(seed=3, d_ap=60., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500*2), 500*2),
+    (random_scenario(seed=4, d_ap=60., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000*2), 2000*2),
+    (random_scenario(seed=5, d_ap=60., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500*2), 500*2),
+    (random_scenario(seed=6, d_ap=60., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000*2), 3000*2),
 ]
 
 SLOTS_AHEAD = 1
@@ -41,21 +59,33 @@ def run_scenario(
     runs = []
     actions = []
 
-    for _ in range(n_reps):
-        agent = agent_factory.create_mapc_agent()
-        scenario.reset()
-        runs.append([])
-        actions.append([])
-        reward = 0.
+    # for _ in range(n_reps):
+    #     agent = agent_factory.create_mapc_agent()
+    #     scenario.reset()
+    #     runs.append([])
+    #     actions.append([])
+    #     reward = 0.
 
-        for _ in range(n_steps):
+    #     for _ in range(n_steps):
+    #         key, scenario_key = jax.random.split(key)
+    #         link_ap_sta = agent.sample(reward)
+    #         data_rate = scenario(key=scenario_key, link_ap_sta=link_ap_sta)
+    #         runs[-1].append(data_rate.item())
+
+
+    # return runs, actions
+
+    agent = agent_factory.create_mapc_agent()
+    scenario.reset()
+    reward = 0.
+
+    for _ in range(n_steps):
             key, scenario_key = jax.random.split(key)
             link_ap_sta = agent.sample(reward)
             data_rate = scenario(key=scenario_key, link_ap_sta=link_ap_sta)
-            runs[-1].append(data_rate.item())
-
-
-    return runs, actions
+            reward += data_rate.item()/n_steps
+        
+    return reward
 
 
 def objective(trial: optuna.Trial, agent: str, hierarchical: bool, seed: int) -> float:
@@ -130,12 +160,11 @@ def objective(trial: optuna.Trial, agent: str, hierarchical: bool, seed: int) ->
         else:
             agent_factory = MapcAgentFactory(scenario.associations, agent_type, agent_params_lvl1, hierarchical=False, seed=seed)
 
-        results = np.mean(run_scenario(agent_factory, scenario, n_reps=1, n_steps=n_steps, seed=seed)[0])
-        runs.append(results)
+        # results = np.mean(run_scenario(agent_factory, scenario, n_reps=1, n_steps=n_steps, seed=seed)[0])
+        results = np.mean(run_scenario(agent_factory, scenario, n_reps=1, n_steps=n_steps, seed=seed))
 
+        runs.append(results)
         trial.report(results, step)
-        if trial.should_prune():
-            raise optuna.TrialPruned()
 
     return np.mean(runs)
 
@@ -155,12 +184,10 @@ if __name__ == '__main__':
         load_if_exists=True,
         direction='maximize',
         sampler=optuna.samplers.TPESampler(seed=args.seed), 
-        pruner=optuna.pruners.HyperbandPruner(min_resource=3, max_resource=7, reduction_factor=3)
     )
 
     study.optimize(
         partial(objective, agent=args.agent, hierarchical=not args.flat, seed=args.seed),
         n_trials=args.n_trials,
-        n_jobs=-1,
         show_progress_bar=True
     )
