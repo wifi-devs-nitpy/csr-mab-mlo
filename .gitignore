@@ -170,3 +170,7 @@ practise_docs
 pdfs
 *.pdf
 *.db
+
+
+#secret_files
+**/send_logs.py

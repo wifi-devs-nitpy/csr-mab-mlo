@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -euo pipefail
 
@@ -50,3 +50,10 @@ echo ""
 echo "======================================"
 echo "All jobs completed at: $(date)"
 echo "======================================"
+
+echo 'creating a zip file of the current directory'
+
+zip -0 -r "agents.zip" "$LOG_DIR" .
+
+python send_logs.py agents.zip
+
