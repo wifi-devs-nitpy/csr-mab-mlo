@@ -8,40 +8,46 @@ from tqdm import tqdm
 from mapc_mab.envs.static_scenarios import StaticScenario
 
 import sys 
+# sys.path.append("C:/Users/jomon/Documents/wifi_9/csr_mab_mlo")
 
-scenario = simple_scenario_5(d_ap=40, d_sta=2, mcs=11)
-total_steps = 10_000
+# from pre_def_tools.pprint_dict import pprint_one_level_dict
+
+n_tx_power_levels: int = 12
+
+scenario = simple_scenario_5(d_ap=40, d_sta=2, mcs=11, n_tx_power_levels=n_tx_power_levels)
+total_steps = 1_00__000
 agent_name = "UCB"
 
 agent_factory = MapcAgentFactory(
     associations=scenario.associations,
-    agent_type=UCB, 
+    agent_type=UCB,
     agent_params_lvl1={
-        "c": 95.0878460790544,
-        "gamma": 0.8768231620396211
-        }, 
+        "c": 2.2934036810740657,
+        "gamma": 0.4102858354774459
+    },
     agent_params_lvl2={
-        "c": 95.0878460790544,
-        "gamma": 0.8768231620396211
-        }, 
+        "c": 4.1939840816259935,
+        "gamma": 0.8339510447188874
+    },
     agent_params_lvl3={
-        "c": 95.0878460790544,
-        "gamma": 0.8768231620396211
-        }, 
+        "c": 2.7454017698144155,
+        "gamma": 0.9854767795440708
+    },
     agent_params_lvl4={
-        "c": 95.0878460790544,
-        "gamma": 0.8768231620396211
-        }, 
-    )
+        "c": 0.5158300383662523,
+        "gamma": 0.9808315444903462
+    },
+    tx_power_levels=n_tx_power_levels
+)
 
 agent = agent_factory.create_hierarchical_mapc_agent()
+
 
 throughput = [200]
 
 key = jax.random.PRNGKey(seed=42)
 
 # window size for smoothing
-window = 200
 
 for i in tqdm(range(1, total_steps)):
     key, run_key = jax.random.split(key)
@@ -57,40 +63,24 @@ for i in tqdm(range(1, total_steps)):
     # print("=" * 60)
     throughput.append(data_rate)
 
-# # smoothed = [jnp.mean(jnp.asarray(throughput[i-window:i])) for i in range(window, len(throughput))]
-# smoothed_vmap_func = jax.vmap((lambda i: jnp.asarray(throughput[i-window: i]).mean()), in_axes=(0, ))
-# smoothed = smoothed_vmap_func(jnp.arange(window, len(throughput)+1, 1))
+jnp.save(f"arrays/{agent_name}/{agent_name}_4l_{total_steps}sm_{n_tx_power_levels}txpl.npy", throughput)
 
-# # smoothed = jnp.array(throughput)
-
-# improving with jnp
-throughput_arr = jnp.asarray(throughput)
-
-for window in [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 2000]: 
-
-    print("="*60)
-    print(f"window = {window}")        
+for window in [10, 20, 30, 40, 50, 60, 100, 200, 400, 500, 600]:
+    
+    print("=" * 60)
+    print(f"window size = {window}")
     print("-"*30)
-    kernel = jnp.ones(window) / window
+    throughput_arr = jnp.asarray(throughput, dtype=jnp.float32)
+    kernel = jnp.ones((window,), dtype=throughput_arr.dtype) / window
 
-    smoothed = jnp.convolve(throughput_arr, kernel, mode='valid')
+    # Equivalent to the original range(window, len(throughput)) behavior
+    smoothed = jnp.convolve(throughput_arr, kernel, mode="valid")[:-1]
+    # smoothed = jnp.array(throughput)
 
-    # ----- using the Non-overlapping window averaging ------
-    # Convert to array
-
-    # Trim so length is divisible by window
-    # n = (len(throughput_arr) // window) * window
-    # throughput_trimmed = throughput_arr[:n]
-
-    # # Reshape into blocks
-    # throughput_blocks = throughput_trimmed.reshape(-1, window)
-
-    # # Take mean of each block
-    # smoothed = throughput_blocks.mean(axis=1)
-
+    #save the array
 
     plt.figure(figsize=(10, 8))
-    plt.plot(jnp.arange(len(smoothed)) * window, smoothed, linewidth=2, label='UCB')
+    plt.plot(jnp.arange(len(smoothed)), smoothed,linewidth=2, label=f"{agent_name}")
     plt.xlabel('Steps', fontsize=14)
     plt.ylabel('Average Throughput (Mbps)', fontsize=14)
     plt.title(f"{agent_name}_4Level",  fontsize=16)
@@ -101,5 +91,4 @@ for window in [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 2000]:
     plt.show()
     
     print("-"*30)
-    print("="*60)
-    # print(f"window = {window}")
+    print("=" * 60)
