@@ -65,7 +65,8 @@ class DynamicScenario(Scenario):
             walls_sec: Optional[Array] = None,
             walls_pos_sec: Optional[Array] = None,
             switch_steps: Optional[list] = None,
-            tx_power_delta: Scalar = 3.0
+            tx_power_delta: Scalar = 3.0, 
+            n_tx_power_levels: int = 4,
     ) -> None:
         super().__init__(associations)
 
@@ -100,7 +101,8 @@ class DynamicScenario(Scenario):
             pos=pos_sec,
             mcs=jnp.full(pos_sec.shape[0], mcs_sec, dtype=jnp.int32),
             sigma=sigma_sec,
-            walls=walls_sec
+            walls=walls_sec, 
+            n_tx_power_levels=n_tx_power_levels
         ))
         self.tx_power_sec = jnp.full(pos_sec.shape[0], tx_power_sec)
         self.mcs_sec = mcs_sec

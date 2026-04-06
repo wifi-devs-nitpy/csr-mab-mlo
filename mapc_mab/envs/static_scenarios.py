@@ -47,7 +47,8 @@ class StaticScenario(Scenario):
             associations: dict,
             walls: Optional[Array] = None,
             walls_pos: Optional[Array] = None,
-            tx_power_delta: Scalar = 3.0
+            tx_power_delta: Scalar = 3.0, 
+            n_tx_power_levels: int = 4
     ) -> None:
         super().__init__(associations)
 
@@ -64,12 +65,22 @@ class StaticScenario(Scenario):
             pos=self.pos,
             mcs=jnp.full(pos.shape[0], mcs, dtype=jnp.int32),
             sigma=self.sigma,
-            walls=self.walls
+            walls=self.walls, 
+            n_tx_power_levels=n_tx_power_levels
         ))
 
     def __call__(self, key: PRNGKey, link_ap_sta: dict[str: jax.Array]) -> tuple[Scalar, Scalar]:
         thr = self.data_rate_fn(key=key, link_ap_sta=link_ap_sta)
         return thr
+
+    def batch__call__(self, key: PRNGKey, link_ap_sta: dict[str: jax.Array]) -> tuple[Scalar, Scalar]:
+        throughput = []
+        for i in jnp.arange(100):
+            key, run_key = jax.random.split(key)
+            run_thr = self.data_rate_fn(key=run_key, link_ap_sta=link_ap_sta)
+            throughput.append(run_thr)
+
+        return jnp.asarray(throughput).mean()
 
     def plot(self, filename: str = None) -> None:
         super().plot(self.pos, filename, self.walls_pos)
@@ -268,7 +279,8 @@ def simple_scenario_5(
         d_sta: Scalar = 2.,
         mcs: int = DEFAULT_MCS,
         tx_power: Scalar = DEFAULT_TX_POWER,
-        sigma: Scalar = DEFAULT_SIGMA
+        sigma: Scalar = DEFAULT_SIGMA,
+        n_tx_power_levels: int = 4
 ) -> StaticScenario:
     """
     STA 16   STA 15         |        STA 12   STA 11
@@ -350,4 +362,4 @@ def simple_scenario_5(
         [d_ap / 2, d_ap / 2, d_ap / 2, d_ap + d_ap / 2],
     ])
 
-    return StaticScenario(pos, mcs, tx_power, sigma, associations, walls, walls_pos)
+    return StaticScenario(pos, mcs, tx_power, sigma, associations, walls, walls_pos, n_tx_power_levels=n_tx_power_levels)
