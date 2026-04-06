@@ -1,8 +1,8 @@
 import os
 os.environ['JAX_ENABLE_X64'] = 'True'
-os.environ['JAX_COMPILATION_CACHE_DIR'] = '/tmp/jax_cache'
-os.environ['JAX_PERSISTENT_CACHE_MIN_ENTRY_SIZE_BYTES'] = '-1'
-os.environ['JAX_PERSISTENT_CACHE_MIN_COMPILE_TIME_SECS'] = '0'
+os.environ['JAX_COMPILATION_CACHE_DIR'] = "c:/jax_cache"
+# os.environ['JAX_PERSISTENT_CACHE_MIN_ENTRY_SIZE_BYTES'] = '-1'
+# os.environ['JAX_PERSISTENT_CACHE_MIN_COMPILE_TIME_SECS'] = '0'
 
 from argparse import ArgumentParser
 from functools import partial
@@ -19,24 +19,12 @@ from mapc_mab.envs.static_scenarios import Scenario
 
 
 TRAINING_SCENARIOS = [
-    (random_scenario(seed=1, d_ap=20., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500), 500),
-    (random_scenario(seed=2, d_ap=20., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000), 1000),
-    (random_scenario(seed=3, d_ap=20., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500), 500),
-    (random_scenario(seed=4, d_ap=20., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000), 2000),
-    (random_scenario(seed=5, d_ap=20., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500), 500),
-    (random_scenario(seed=6, d_ap=20., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000), 3000),
-    (random_scenario(seed=1, d_ap=30., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500), 500),
-    (random_scenario(seed=2, d_ap=30., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000), 1000),
-    (random_scenario(seed=3, d_ap=30., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500), 500),
-    (random_scenario(seed=4, d_ap=30., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000), 2000),
-    (random_scenario(seed=5, d_ap=30., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500), 500),
-    (random_scenario(seed=6, d_ap=30., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000), 3000),
-    (random_scenario(seed=1, d_ap=50., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500), 500),
-    (random_scenario(seed=2, d_ap=50., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000), 1000),
-    (random_scenario(seed=3, d_ap=50., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500), 500),
-    (random_scenario(seed=4, d_ap=50., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000), 2000),
-    (random_scenario(seed=5, d_ap=50., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500), 500),
-    (random_scenario(seed=6, d_ap=50., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000), 3000),
+    (random_scenario(seed=1, d_ap=30., d_sta=8., n_ap=2, n_sta_per_ap=5, max_steps=500*5), 500*5),
+    (random_scenario(seed=2, d_ap=30., d_sta=5., n_ap=3, n_sta_per_ap=3, max_steps=1000*5), 1000*5),
+    (random_scenario(seed=3, d_ap=30., d_sta=5., n_ap=3, n_sta_per_ap=4, max_steps=500*5), 500*5),
+    (random_scenario(seed=4, d_ap=30., d_sta=5., n_ap=4, n_sta_per_ap=3, max_steps=2000*5), 2000*5),
+    (random_scenario(seed=5, d_ap=30., d_sta=4., n_ap=4, n_sta_per_ap=4, max_steps=500*5), 500*5),
+    (random_scenario(seed=6, d_ap=30., d_sta=4., n_ap=5, n_sta_per_ap=3, max_steps=3000*5), 3000*5),
 ]
 
 SLOTS_AHEAD = 1
@@ -183,5 +171,6 @@ if __name__ == '__main__':
     study.optimize(
         partial(objective, agent=args.agent, hierarchical=not args.flat, seed=args.seed),
         n_trials=args.n_trials,
+        n_jobs=1,
         show_progress_bar=True
     )

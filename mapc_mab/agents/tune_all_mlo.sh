@@ -91,6 +91,6 @@ zip -0 -r "agents.zip" "$LOG_DIR" .
 echo "Emailing the attachments on successfull completion" 
 python send_logs.py agents.zip
 
-echo "System will shut down in 1 minute..."
+echo "System will shut down in 2 minutes..."
 
-shutdown.exe /s /t 120
+shutdown -s -t 120

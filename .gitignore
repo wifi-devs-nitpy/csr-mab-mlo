@@ -176,3 +176,6 @@ pdfs
 **/send_logs.py
 **/send_run_status.py
 
+#arrays_files
+**/*.npy
+
