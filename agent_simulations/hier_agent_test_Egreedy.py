@@ -8,35 +8,33 @@ from tqdm import tqdm
 from mapc_mab.envs.static_scenarios import StaticScenario
 
 import sys 
-sys.path.append("C:/Users/jomon/Documents/wifi_9/csr_mab_mlo")
+sys.path.append(".")
 
-from pre_def_tools.pprint_dict import pprint_one_level_dict
-
-scenario = simple_scenario_5(d_ap=20, d_sta=2, mcs=11)
-total_steps = 10000
+scenario = simple_scenario_5(d_ap=40, d_sta=2, mcs=11)
+total_steps = 2000
 
 agent_factory = MapcAgentFactory(
     associations=scenario.associations,
     agent_type=EGreedy, 
     agent_params_lvl1={
-        "alpha": 0.4044486846101334,
-        "e": 0.022387646818308484,
-        "optimistic_start": 61.469386521463726
+        "alpha": 0.6190443508011634,
+        "e": 0.021079147434349507,
+        "optimistic_start": 28.02580115407505
         }, 
     agent_params_lvl2={
-        "alpha": 0.6099734650946088,
-        "e": 0.02264440960496483,
-        "optimistic_start": 0.11864219592126801
+        "alpha": 0.525786225102296,
+        "e": 0.029119085412665096,
+        "optimistic_start": 52.67521144731224
         }, 
     agent_params_lvl3={
-        "alpha": 0.9997639987203092,
-        "e": 0.014463140449789146,
-        "optimistic_start": 5.321997157835438
+        "alpha": 0.808941375014292,
+        "e": 0.03003810096861446,
+        "optimistic_start": 65.24736631881609
         }, 
     agent_params_lvl4={
-        "alpha": 0.2651533433068078,
-        "e": 0.04669117425272768,
-        "optimistic_start": 43.83307649265877
+        "alpha": 0.8252966772746064,
+        "e": 0.059353379674557366,
+        "optimistic_start": 18.235559629882363
         }, 
     ) 
 
@@ -63,11 +61,11 @@ for i in tqdm(range(1, total_steps)):
     # print("=" * 60)
     throughput.append(data_rate)
 
-smoothed = [jnp.mean(jnp.array(throughput[i-window:i])) for i in range(window, len(throughput))]
+smoothed = [jnp.mean(jnp.asarray(throughput[0:i])) for i in range(1, len(throughput))]
 # smoothed = jnp.array(throughput)
 
 plt.figure(figsize=(10, 8))
-plt.plot(jnp.arange(len(smoothed)), smoothed,linewidth=2)
+plt.plot(jnp.arange(len(smoothed)), smoothed, linewidth=2)
 plt.xlabel('Steps', fontsize=14)
 plt.ylabel('Average Throughput (Mbps)', fontsize=14)
 plt.title(f"Egreedy_4Level",  fontsize=16)
