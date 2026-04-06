@@ -175,4 +175,5 @@ pdfs
 #secret_files
 **/send_logs.py
 **/send_run_status.py
-
+**/*.zip
+**/*.png

@@ -36,8 +36,8 @@ def send_email(log_path: str, subject: str, body: str):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
+    if len(sys.argv) < 4:
         print("Usage: python send_logs.py <log_file>")
         sys.exit(1)
 
-    send_email(sys.argv[1])
+    send_email(sys.argv[1], sys.argv[2], sys.argv[3])
