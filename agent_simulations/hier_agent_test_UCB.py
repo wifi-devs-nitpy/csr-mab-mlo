@@ -8,14 +8,11 @@ from tqdm import tqdm
 from mapc_mab.envs.static_scenarios import StaticScenario
 
 import sys 
-# sys.path.append("C:/Users/jomon/Documents/wifi_9/csr_mab_mlo")
-
-# from pre_def_tools.pprint_dict import pprint_one_level_dict
 
 n_tx_power_levels: int = 12
 
 scenario = simple_scenario_5(d_ap=40, d_sta=2, mcs=11, n_tx_power_levels=n_tx_power_levels)
-total_steps = 1_00__000
+total_steps = 10_000
 agent_name = "UCB"
 
 agent_factory = MapcAgentFactory(
