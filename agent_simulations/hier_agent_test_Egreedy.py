@@ -7,6 +7,9 @@ from reinforced_lib.agents.mab import EGreedy, Softmax, UCB, ThompsonSampling
 from tqdm import tqdm
 from mapc_mab.envs.static_scenarios import StaticScenario
 import os
+from test.net_data_rate.plotFuncs.plots_and_scenario_generators.scenario_plot import plot_network_scenario
+print(plot_network_scenario)
+
 
 import sys 
 
