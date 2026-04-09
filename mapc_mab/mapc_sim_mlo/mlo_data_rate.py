@@ -17,7 +17,7 @@ def network_data_rate_mlo(
         # key: jax.random.PRNGKey, 
         # pos, 
         # walls, 
-        n_tx_power_levels = 4
+        n_tx_power_levels = 4, 
     ):
 
     """
@@ -61,16 +61,15 @@ def network_data_rate_mlo(
 
     net_data_rate_mlo_1 = partial(network_data_rate, pos=pos, walls=walls, mcs=mcs, sigma=sigma)
     
-    key_2g, key_5g, key_6g = jax.random.split(key, 3)
-    
+    key_2g, key_5g, key_6g = jax.random.split(key, 3)    
+
     tx_power_array_2g = tx_power_indices_to_tx_power(link_ap_sta[0]["tx_power_indices"], n_tx_power_levels=n_tx_power_levels, min_tx_power=MIN_TX_POWER, max_tx_power=MAX_TX_POWER)
     tx_power_array_5g = tx_power_indices_to_tx_power(link_ap_sta[1]["tx_power_indices"], n_tx_power_levels=n_tx_power_levels, min_tx_power=MIN_TX_POWER, max_tx_power=MAX_TX_POWER)
     tx_power_array_6g = tx_power_indices_to_tx_power(link_ap_sta[2]["tx_power_indices"], n_tx_power_levels=n_tx_power_levels, min_tx_power=MIN_TX_POWER, max_tx_power=MAX_TX_POWER)
-
+    
     # tx_power_array_2g = jnp.ones(shape=(n_nodes, ), dtype=jnp.float32) * DEFAULT_TX_POWER
     # tx_power_array_5g = jnp.ones(shape=(n_nodes, ), dtype=jnp.float32) * DEFAULT_TX_POWER
     # tx_power_array_6g = jnp.ones(shape=(n_nodes, ), dtype=jnp.float32) * DEFAULT_TX_POWER
-
 
     data_rate_2g = net_data_rate_mlo_1(key_2g, tx=link_ap_sta[0]["tx_matrix"], tx_power=tx_power_array_2g, channel_width=CHANNEL_WIDTH_2G, path_loss_fn=path_loss_2g)
     data_rate_5g = net_data_rate_mlo_1(key_5g, tx=link_ap_sta[1]["tx_matrix"], tx_power=tx_power_array_5g, channel_width=CHANNEL_WIDTH_5G, path_loss_fn=path_loss_5g)

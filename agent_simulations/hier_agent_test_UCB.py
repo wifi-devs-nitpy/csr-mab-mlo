@@ -8,31 +8,33 @@ from tqdm import tqdm
 from mapc_mab.envs.static_scenarios import StaticScenario
 
 import sys 
+import os 
+
 
 n_tx_power_levels: int = 12
 
-scenario = simple_scenario_5(d_ap=40, d_sta=2, mcs=11, n_tx_power_levels=n_tx_power_levels)
+scenario = simple_scenario_5(d_ap=30, d_sta=2, mcs=11, n_tx_power_levels=n_tx_power_levels)
 total_steps = 10_000
-agent_name = "UCB"
+agent_name = "UCB_claude"
 
 agent_factory = MapcAgentFactory(
     associations=scenario.associations,
     agent_type=UCB,
     agent_params_lvl1={
-        "c": 2.2934036810740657,
-        "gamma": 0.4102858354774459
+        "c": 4.218913267062766,
+        "gamma": 0.9852769563017848
     },
     agent_params_lvl2={
-        "c": 4.1939840816259935,
-        "gamma": 0.8339510447188874
+        "c": 2.3334773416428027,
+        "gamma": 0.6531579899635707
     },
     agent_params_lvl3={
-        "c": 2.7454017698144155,
-        "gamma": 0.9854767795440708
+        "c": 2.8509916876503016,
+        "gamma": 0.9333808917621175
     },
     agent_params_lvl4={
-        "c": 0.5158300383662523,
-        "gamma": 0.9808315444903462
+        "c": 2.1701336668896456,
+        "gamma": 0.9344755004011221
     },
     tx_power_levels=n_tx_power_levels
 )
@@ -60,7 +62,8 @@ for i in tqdm(range(1, total_steps)):
     # print("=" * 60)
     throughput.append(data_rate)
 
-jnp.save(f"arrays/{agent_name}/{agent_name}_4l_{total_steps}sm_{n_tx_power_levels}txpl.npy", throughput)
+os.makedirs(f"arrays/{agent_name}", exist_ok=True)
+jnp.save(f"arrays/{agent_name}/{agent_name}_4l_{total_steps//1000}k-sm_{n_tx_power_levels}txpl.npy", throughput)
 
 for window in [10, 20, 30, 40, 50, 60, 100, 200, 400, 500, 600]:
     
@@ -84,7 +87,7 @@ for window in [10, 20, 30, 40, 50, 60, 100, 200, 400, 500, 600]:
     plt.legend(fontsize=12, loc="lower right", frameon=True)
     plt.grid(True, which='both', linestyle=':', linewidth=0.7, alpha=0.7)
     plt.tight_layout()
-    plt.savefig(f"{agent_name}_4Level", dpi=600, bbox_inches='tight')
+    # plt.savefig(f"{agent_name}_4Level", dpi=600, bbox_inches='tight')
     plt.show()
     
     print("-"*30)

@@ -36,7 +36,7 @@ def plot_network_scenario(
     figsize: tuple = (8, 8)
 ):
     """
-    Plot a wireless network scenario with Access Points (APs) and Stations (STAs).
+    Plot a Wi-Fi scenario with Access Points (APs) and Stations (STAs).
 
     Parameters
     ----------
