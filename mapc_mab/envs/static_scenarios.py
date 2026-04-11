@@ -63,7 +63,7 @@ class StaticScenario(Scenario):
         self.data_rate_fn = jax.jit(partial(
             network_data_rate_mlo,
             pos=self.pos,
-            mcs=jnp.full(pos.shape[0], mcs, dtype=jnp.int32),
+            mcs=mcs,
             sigma=self.sigma,
             walls=self.walls, 
             n_tx_power_levels=n_tx_power_levels
