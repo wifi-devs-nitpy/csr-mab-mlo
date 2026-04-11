@@ -124,9 +124,9 @@ class HierarchicalMapcAgent(MapcAgent):
         sta_group_action = {}
 
         for ap in ap_group:
-            reward = self.rewards[self.assign_stations_last_step[ap_group, ap]]
-            self.assign_stations_last_step[ap_group, ap] = self.step
-            n, idx = self.assign_stations_dict[ap_group, ap]
+            reward = self.rewards[self.assign_stations_last_step[all_aps, ap]]
+            self.assign_stations_last_step[all_aps, ap] = self.step
+            n, idx = self.assign_stations_dict[all_aps, ap]
             sta_group_action[ap] = self.assign_stations_agents[n].sample(reward, agent_id=idx).item()
 
         sta_group = self.sta_group_action_to_sta_group(sta_group_action)
