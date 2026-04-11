@@ -21,20 +21,20 @@ agent_factory = MapcAgentFactory(
     associations=scenario.associations,
     agent_type=UCB,
     agent_params_lvl1={
-        "c": 4.218913267062766,
-        "gamma": 0.9852769563017848
+        "c": 95.0878460790544,
+        "gamma": 0.8768231620396211
     },
     agent_params_lvl2={
-        "c": 2.3334773416428027,
-        "gamma": 0.6531579899635707
+       "c": 95.0878460790544,
+        "gamma": 0.8768231620396211
     },
     agent_params_lvl3={
-        "c": 2.8509916876503016,
-        "gamma": 0.9333808917621175
+        "c": 2.7454017698144155,
+        "gamma": 0.9854767795440708
     },
     agent_params_lvl4={
-        "c": 2.1701336668896456,
-        "gamma": 0.9344755004011221
+        "c": 0.5158300383662523,
+        "gamma": 0.9808315444903462
     },
     tx_power_levels=n_tx_power_levels
 )
@@ -42,7 +42,7 @@ agent_factory = MapcAgentFactory(
 agent = agent_factory.create_hierarchical_mapc_agent()
 
 
-throughput = [200]
+throughput = [1300]
 
 key = jax.random.PRNGKey(seed=42)
 
