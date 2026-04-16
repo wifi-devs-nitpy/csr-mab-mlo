@@ -111,6 +111,10 @@ class HierarchicalMapcAgent(MapcAgent):
         sharing_ap = np.random.choice(self.access_points).item()
         designated_station = np.random.choice(self.associations[sharing_ap]).item()
 
+        # sharing_ap = 0
+        # designated_station = 6
+        
+
         # Sample the agent that finds groups of APs
         reward = self.rewards[self.find_groups_last_step[designated_station]]
         self.find_groups_last_step[designated_station] = self.step
