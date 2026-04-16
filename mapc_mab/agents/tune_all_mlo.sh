@@ -74,10 +74,12 @@ run_job() {
 
 # -------- JOBS --------
 
-run_job "EGreedy" "egreedy.db"
-run_job "Softmax" "softmax.db"
-run_job "UCB" "ucb.db"
-run_job "NormalThompsonSampling" "ts.db"
+# run_job "EGreedy" "egreedy.db"
+# run_job "Softmax" "softmax.db"
+# run_job "UCB" "ucb.db"
+# run_job "NormalThompsonSampling" "ts.db"
+
+python -u tuning_3.py
 
 echo ""
 echo "======================================"

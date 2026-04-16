@@ -8,7 +8,7 @@ PLOT_PARAMS = {
     'figure.figsize': (COLUMN_WIDTH, COLUMN_HIGHT),
     'figure.dpi': 72,
     'font.size': 9,
-    'font.family': 'serif',
+    # 'font.family': 'serif',
     'font.serif': 'cm',
     'axes.titlesize': 9,
     'axes.linewidth': 0.5,
