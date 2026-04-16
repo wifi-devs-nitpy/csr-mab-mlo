@@ -7,9 +7,8 @@ from reinforced_lib.agents.mab import EGreedy, Softmax, UCB, ThompsonSampling
 from tqdm import tqdm
 from mapc_mab.envs.static_scenarios import StaticScenario
 import os
-from test.net_data_rate.plotFuncs.plots_and_scenario_generators.scenario_plot import plot_network_scenario
-print(plot_network_scenario)
-
+from agent_simulations.util_funcs.averaging_funcs import ema
+from agent_simulations.util_funcs.plot_funcs import plot_throughput_histogram
 
 import sys 
 
@@ -17,7 +16,7 @@ n_tx_power_levels: int = 12
 
 scenario = simple_scenario_5(d_ap=30, d_sta=2, mcs=11, n_tx_power_levels=n_tx_power_levels)
 total_steps = 5000
-agent_name = "EGreedy"
+agent_name = "EGreedy_shar_ap_s_fixed"
 
 agent_factory = MapcAgentFactory(
     associations=scenario.associations,
@@ -57,7 +56,7 @@ key = jax.random.PRNGKey(seed=42)
 for i in tqdm(range(1, total_steps+1)):
     key, run_key = jax.random.split(key)
     link_ap_sta = agent.sample(throughput[-1])
-    data_rate = scenario.batch__call__(run_key, link_ap_sta)
+    data_rate = scenario.__call__(run_key, link_ap_sta)
     # print("=" * 60)
     # print(f"at step -> prev reward = {throughput[-1]}")
     # for link in link_ap_sta.values(): 
@@ -71,30 +70,71 @@ for i in tqdm(range(1, total_steps+1)):
 os.makedirs(f"arrays/{agent_name}", exist_ok=True)
 jnp.save(f"arrays/{agent_name}/{agent_name}_4l_{total_steps}sm_{n_tx_power_levels}txpl.npy", throughput)
 
-for window in [10, 20, 30, 40, 50, 60, 100, 200, 400, 500]:
-    print("=" * 60)
-    print(f"window size = {window}")
-    print("-" * 30)
+throughput = jnp.asarray(throughput)
+
+
+# for window in [10, 20, 30, 40, 50, 60, 100, 200, 400, 500]:
+#     print("=" * 60)
+#     print(f"window size = {window}")
+#     print("-" * 30)
     
-    throughput_arr = jnp.asarray(throughput, dtype=jnp.float32)
-    kernel = jnp.ones((window,), dtype=throughput_arr.dtype) / window
+#     throughput_arr = jnp.asarray(throughput, dtype=jnp.float32)
+#     kernel = jnp.ones((window,), dtype=throughput_arr.dtype) / window
 
-    # Equivalent to the original range(window, len(throughput)) behavior
-    smoothed = jnp.convolve(throughput_arr, kernel, mode="valid")[:-1]
-    # smoothed = jnp.array(throughput)
+#     # Equivalent to the original range(window, len(throughput)) behavior
+#     smoothed = jnp.convolve(throughput_arr, kernel, mode="valid")[:-1]
+#     # smoothed = jnp.array(throughput)
 
-    #save the array
+#     #save the array
 
-    plt.figure(figsize=(10, 8))
-    plt.plot(jnp.arange(len(smoothed)), smoothed,linewidth=2, label=f"{agent_name}")
-    plt.xlabel('Steps', fontsize=14)
-    plt.ylabel('Average Throughput (Mbps)', fontsize=14)
-    plt.title(f"{agent_name}_4Level",  fontsize=16)
-    plt.legend(fontsize=12, loc="lower right", frameon=True)
-    plt.grid(True, which='both', linestyle=':', linewidth=0.7, alpha=0.7)
+#     plt.figure(figsize=(10, 8))
+#     plt.plot(jnp.arange(len(smoothed)), smoothed,linewidth=2, label=f"{agent_name}")
+#     plt.xlabel('Steps', fontsize=14)
+#     plt.ylabel('Average Throughput (Mbps)', fontsize=14)
+#     plt.title(f"{agent_name}_4Level",  fontsize=16)
+#     plt.legend(fontsize=12, loc="lower right", frameon=True)
+#     plt.grid(True, which='both', linestyle=':', linewidth=0.7, alpha=0.7)
+#     plt.tight_layout()
+#     plt.savefig(f"{agent_name}_4Level", dpi=600, bbox_inches='tight')
+#     plt.show()
+    
+#     print("-"*30)
+#     print("=" * 60)
+
+throughput = jnp.asarray(throughput)
+throughputs_mva = jnp.convolve(throughput, jnp.ones(100) / 100, mode='valid')
+
+
+plt.figure(figsize=(12, 6))
+plt.plot(throughputs_mva, linewidth=2, label=f"MVA_100")
+plt.title("Comparison of mva size=100", fontsize=14, fontweight='bold')
+plt.xlabel("Time Steps", fontsize=12)
+plt.ylabel("Value", fontsize=12)
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+
+for alpha in [0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.7]:
+    smoothed = ema(throughput, alpha=alpha)
+    plt.figure(figsize=(12, 6))
+    plt.plot(smoothed, linewidth=2, label=f"EMA")
+    plt.title(f"Comparison of EMA - alpha={alpha}", fontsize=14, fontweight='bold')
+    plt.xlabel("Time Steps", fontsize=12)
+    plt.ylabel("Value", fontsize=12)
+    plt.grid(True, linestyle='--', alpha=0.6)
+    plt.legend()
     plt.tight_layout()
-    plt.savefig(f"{agent_name}_4Level", dpi=600, bbox_inches='tight')
     plt.show()
+
+## printing the standard deviations and means of different sets of data 
+## after 2000 trials 
+step = 100
+for x in range(0, 10000, step):
+    print(f"mean is {jnp.mean(throughput[x:x+step])} , std:deviation: {jnp.std(throughput[x:x+step])}")
     
-    print("-"*30)
-    print("=" * 60)
+print("After 2000 trails at once")
+print(f"mean is {jnp.mean(throughput[2000:])} , std:deviation: {jnp.std(throughput[2000:])}")
+    
+plot_throughput_histogram(throughput)

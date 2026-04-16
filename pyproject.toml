@@ -30,7 +30,7 @@ dependencies = [
 ]
 
 [tool.setuptools]
-packages = ["mapc_mab", "test"]
+packages = ["mapc_mab", "test", "agent_simulations"]
 
 [build-system]
 requires = ["setuptools", "wheel"]
