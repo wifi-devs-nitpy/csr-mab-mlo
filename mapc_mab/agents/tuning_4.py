@@ -1,3 +1,9 @@
+import os
+os.environ['JAX_ENABLE_X64'] = 'True'
+os.environ['JAX_COMPILATION_CACHE_DIR'] = '/tmp/jax_cache'
+os.environ['JAX_PERSISTENT_CACHE_MIN_ENTRY_SIZE_BYTES'] = '-1'
+os.environ['JAX_PERSISTENT_CACHE_MIN_COMPILE_TIME_SECS'] = '0'
+
 import optuna
 import jax
 import jax.numpy as jnp
@@ -7,7 +13,7 @@ from mapc_mab.agents.mapc_agent_factory import MapcAgentFactory
 from reinforced_lib.agents.mab import UCB
 
 # Configuration
-TOTAL_STEPS = 6000
+TOTAL_STEPS = 5000
 BURN_IN = 2000
 BLOCK_SIZE = 100
 N_TX_POWER_LEVELS = 12
@@ -128,7 +134,7 @@ study = optuna.create_study(
     storage=f'sqlite:///ucb_s5_fine_tuning_single_obj.db',
     study_name="ucb_s5_fine_tuning_single_obj",
     load_if_exists=True,
-    directions=["maximize", "minimize", "minimize", "minimize"],
+    directions=["maximize"],
     sampler=optuna.samplers.TPESampler(seed=SEED),
 )
 
@@ -148,7 +154,7 @@ print("="*60)
 
 study.optimize(
     objective, 
-    n_trials=600,
+    n_trials=500,
     n_jobs=1,
     show_progress_bar=True
 )
