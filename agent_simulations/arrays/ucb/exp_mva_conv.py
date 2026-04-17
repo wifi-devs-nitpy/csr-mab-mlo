@@ -4,7 +4,7 @@ import jax.numpy as jnp
 import matplotlib.pyplot as plt 
 
 
-throughputs = jnp.load("../Softmax/Softmax_4l_10000sm_12txpl.npy")
+throughputs = jnp.load("C:/Users/jomon/Documents/wifi_9/csr_mab_mlo/agent_simulations/arrays/ucb/UCB_4l_100000sm_12txpl.npy")
 
 throughputs_mva = jnp.convolve(throughputs, jnp.ones(100) / 100, mode='valid')
 

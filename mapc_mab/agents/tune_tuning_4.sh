@@ -95,4 +95,4 @@ python send_logs.py agents_single_obj.zip
 
 echo "System will shut down in 2 minutes..."
 
-shutdown -s -t 120
+# shutdown -s -t 120
