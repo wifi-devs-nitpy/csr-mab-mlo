@@ -14,30 +14,30 @@ import sys
 import os 
 
 
-n_tx_power_levels: int = 12
+n_tx_power_levels: int = 10
 
-scenario = simple_scenario_5(d_ap=30, d_sta=2, mcs=11, n_tx_power_levels=n_tx_power_levels)
-total_steps = 5_000
-agent_name = "UCB_sd_ch_mcs_none"
+scenario = simple_scenario_5(d_ap=10, d_sta=2, mcs=11, n_tx_power_levels=n_tx_power_levels)
+total_steps = 100_000
+agent_name = "UCB_sd_ch"
 
 agent_factory = MapcAgentFactory(
     associations=scenario.associations,
     agent_type=UCB,
     agent_params_lvl1={
-        "c": 2.2934036810740657,
-        "gamma": 0.4102858354774459
+        "c": 1.2219093406313746,
+        "gamma": 0.45769673788451803
     },
     agent_params_lvl2={
-       "c": 4.1939840816259935,
-        "gamma": 0.8339510447188874
+        "c": 1.372388872292921,
+        "gamma": 0.16732034341996938
     },
     agent_params_lvl3={
-        "c": 2.7454017698144155,
-        "gamma": 0.9854767795440708
+        "c": 4.64375395838126,
+        "gamma": 0.6762761531313393
     },
     agent_params_lvl4={
-        "c": 0.5158300383662523,
-        "gamma": 0.9808315444903462
+        "c": 4.04794082305689,
+        "gamma": 0.913861745934784
     },
     tx_power_levels=n_tx_power_levels
 )
@@ -66,7 +66,7 @@ for i in tqdm(range(1, total_steps)):
     throughput.append(data_rate)
 
 os.makedirs(f"arrays/{agent_name}", exist_ok=True)
-jnp.save(f"arrays/{agent_name}/{agent_name}_4l_{total_steps//1000}k-sm_{n_tx_power_levels}txpl.npy", throughput)
+jnp.save(f"arrays/{agent_name}/after_block_opt_1", throughput)
 
 throughput = jnp.asarray(throughput)
 
