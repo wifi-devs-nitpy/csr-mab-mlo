@@ -280,7 +280,7 @@ def compute_max_throughput(d_ap, n_tx_power_levels=4, n_links=3):
 
 
 if __name__ == "__main__": 
-    compute_throughput([(0, 4), (1, 9), (2, 14), (3, 19)], d_ap = 30, plot=False)
+    # compute_throughput([(0, 4), (1, 9), (2, 14), (3, 19)], d_ap = 30, plot=False)
     print(compute_max_throughput(40))
     # run this module to plot the scenario arrangement\
 
