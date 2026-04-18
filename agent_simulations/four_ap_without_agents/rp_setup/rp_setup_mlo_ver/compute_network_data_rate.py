@@ -5,7 +5,6 @@ from mapc_sim.constants import *
 import matplotlib.pyplot as plt
 from functools import partial
 from itertools import product
-from pairing.link_power_combinations import links_power_combs
 from tqdm import tqdm
 
 def compute_throughput(ap_sta_pairs: jax.Array, d_ap: int, plot: bool = False, d_ap_sta: int = 2, link_ap_sta: tuple[list, list] = None): 
@@ -88,8 +87,8 @@ def compute_throughput(ap_sta_pairs: jax.Array, d_ap: int, plot: bool = False, d
     key = jax.random.PRNGKey(42)
     data_rate = []
 
-    tx_matrices = jnp.zeros((3, n_nodes, n_nodes), dtype=jnp.int16)
-    tx_power_indices = jnp.zeros((3, n_nodes), dtype=jnp.int16)
+    tx_matrices = jnp.zeros((3, n_nodes, n_nodes), dtype=jnp.int32)
+    tx_power_indices = jnp.zeros((3, n_nodes), dtype=jnp.int32)
     ap_sta_pairs = jnp.asarray(ap_sta_pairs, dtype=jnp.int32)
 
     tx_matrices = tx_matrices.at[:, ap_sta_pairs[:, 0], ap_sta_pairs[:, 1]].set(1)
@@ -111,12 +110,23 @@ def compute_throughput(ap_sta_pairs: jax.Array, d_ap: int, plot: bool = False, d
     return jnp.asarray(data_rate).mean()
 
 
+def cartesian_product(arrays: list | jax.Array):
+    """
+    Takes a List of arrays and returns the cartesian product of them,
+    Generates all possible combinations from the elements of the arrays
+
+    """
+    grids = jnp.meshgrid(*arrays, indexing='ij')
+    return jnp.stack([g.ravel() for g in grids], axis=1)
+
+
 @jax.jit
 def compute_max_throughput(d_ap, n_tx_power_levels=4, n_links=3):
     ap_sta_pairs = jnp.asarray([(0, 4), (1, 9), (2, 14), (3, 19)])
     aps = ap_sta_pairs[:, 0]
-    tx_power_indices_ap_links = product(product(range(n_tx_power_levels), repeat=n_links), repeat=aps.shape[0])
-    
+
+    list_of_links = jnp.arange(n_links, dtype=jnp.int32)
+        
     n_ap = 4
     d_ap_sta = 2
     n_sta_per_ap = 4
@@ -128,7 +138,7 @@ def compute_max_throughput(d_ap, n_tx_power_levels=4, n_links=3):
         [1, 1], 
         [0, 1]
     ]) * d_ap 
-    
+
     dx = jnp.array([-1, 1, 1, -1]) * d_ap_sta / jnp.sqrt(2)
     dy = jnp.array([-1, -1, 1, 1]) * d_ap_sta / jnp.sqrt(2)
 
@@ -164,7 +174,7 @@ def compute_max_throughput(d_ap, n_tx_power_levels=4, n_links=3):
             for j in bss_sets_for_walls[y]: 
                 walls = walls.at[i, j].set(1).at[j, i].set(1) 
 
-    mcs = jnp.ones(n_nodes, dtype=jnp.int16) * 11
+    mcs = jnp.ones(n_nodes, dtype=jnp.int32) * 11
 
     sigma = DEFAULT_SIGMA
     key = jax.random.PRNGKey(42)
@@ -177,22 +187,41 @@ def compute_max_throughput(d_ap, n_tx_power_levels=4, n_links=3):
     #implementing the jit compilation 
     fast_network_data_rate = jax.jit(partial(network_data_rate_mlo, pos=pos, mcs=mcs, sigma=sigma, walls=walls, n_tx_power_levels=n_tx_power_levels))
 
-    tx_matrix = jnp.zeros((n_nodes, n_nodes), dtype=jnp.int16).at[aps, stas].set(1)
+    tx_matrix = jnp.zeros((n_nodes, n_nodes), dtype=jnp.int32).at[aps, stas].set(1)
     tx_matrices = jnp.repeat(tx_matrix[None, :], repeats=3, axis=0)
     
     max_rate = 0.0
 
-    for power_pair in tqdm(tx_power_indices_ap_links, total=16_777_216):
-        power_pair = jnp.asarray(power_pair)
-        tx_power_levels = jnp.zeros(shape=(n_links, n_nodes), dtype=jnp.int16)
-        tx_power_levels = tx_power_levels.at[:, aps].set(power_pair.T)
+    tx_levels = jnp.arange(n_tx_power_levels, dtype=jnp.int32)
+    links_txp_one_ap = cartesian_product([tx_levels]*n_links)  
+    aps_txp_combination = cartesian_product([jnp.arange(links_txp_one_ap.shape[0], dtype=jnp.int32)]*n_ap)
+    tx_power_indices_ap_links = links_txp_one_ap[aps_txp_combination]
 
-        link_ap_sta=(tx_matrices, tx_power_levels)
+    n_combinations = tx_power_indices_ap_links.shape[0]
 
-        key, run_key = jax.random.split(key, 2)
-        data_rate = fast_network_data_rate(key=run_key, link_ap_sta=link_ap_sta)
+    # Build batched tx power tensor: (n_combinations, n_links, n_nodes)
+    # tx_power_indices_ap_links: (n_combinations, n_ap, n_links)
+    tx_power_levels_batch = jnp.zeros(
+        (n_combinations, n_links, n_nodes), dtype=jnp.int32
+    )
+    tx_power_levels_batch = tx_power_levels_batch.at[:, :, aps].set(
+        jnp.swapaxes(tx_power_indices_ap_links, 1, 2)  # -> (n_combinations, n_links, n_ap)
+    )
 
-        max_rate = jnp.maximum(max_rate, data_rate)
+    # One RNG key per combination
+    key, subkey = jax.random.split(key, 2)
+    keys = jax.random.split(subkey, n_combinations)
+
+    # Vectorized rate evaluation over all power combinations
+    vmapped_rate = jax.vmap(
+        lambda k, tx_power_levels: fast_network_data_rate(
+            key=k, link_ap_sta=(tx_matrices, tx_power_levels)
+        ),
+        in_axes=(0, 0),
+    )
+    rates = vmapped_rate(keys, tx_power_levels_batch)
+
+    max_rate = jnp.max(rates)
 
     return max_rate
 
