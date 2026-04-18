@@ -113,7 +113,7 @@ class HierarchicalMapcAgent(MapcAgent):
 
         # sharing_ap = 0
         # designated_station = 6
-        
+
 
         # Sample the agent that finds groups of APs
         reward = self.rewards[self.find_groups_last_step[designated_station]]
@@ -200,4 +200,7 @@ class HierarchicalMapcAgent(MapcAgent):
 
         # return tx_matrix, tx_power
 
-        return link_ap_sta
+        tx_matrices = np.array(list(link_ap_sta[r]["tx_matrix"] for r in range(0, 3)), dtype=np.int16)
+        tx_power_indices = np.array(list(link_ap_sta[r]["tx_power_indices"] for r in range(0, 3)), dtype=np.int16)
+
+        return (tx_matrices, tx_power_indices)
