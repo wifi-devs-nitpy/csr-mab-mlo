@@ -65,8 +65,8 @@ for i in tqdm(range(1, total_steps)):
     # print("=" * 60)
     throughput.append(data_rate)
 
-os.makedirs(f"arrays/{agent_name}", exist_ok=True)
-jnp.save(f"arrays/{agent_name}/after_block_opt_1", throughput)
+# os.makedirs(f"arrays/{agent_name}", exist_ok=True)
+# jnp.save(f"arrays/{agent_name}/{agent_name}_4l_{total_steps//1000}k-sm_{n_tx_power_levels}txpl.npy", throughput)
 
 throughput = jnp.asarray(throughput)
 
