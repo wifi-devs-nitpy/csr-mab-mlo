@@ -2,13 +2,6 @@ import numpy as np
 from itertools import product 
 import jax.numpy as jnp 
 
-
-# a = np.array([1, 2, 3, 1, 5])
-# mask = np.vstack(a, a)
-
-
-# links = np.array(list(product(range(2), repeat=3)))
-
 a = jnp.arange(0, 4, 1)
 print(list(product((a.tolist()), repeat=2)))
 
