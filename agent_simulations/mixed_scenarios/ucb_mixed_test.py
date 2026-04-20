@@ -16,10 +16,31 @@ import os
 
 n_tx_power_levels: int = 12
 
-scenario = simple_scenario_5(d_ap=30, d_sta=2, mcs=11, n_tx_power_levels=n_tx_power_levels)
-total_steps = 5000
+total_steps = 10_000
 n_reps = 1
 agent_name = "nr_ucb"
+
+
+class MixScen:
+    def __init__(self, scenario_factory, d_sta_1: int, d_sta_2: int, max_steps: int = 10_000):
+        self.scen1 = scenario_factory(d_ap=30, d_sta=d_sta_1, mcs=11, n_tx_power_levels=n_tx_power_levels)
+        self.scen2 = scenario_factory(d_ap=30, d_sta=d_sta_2, mcs=11, n_tx_power_levels=n_tx_power_levels)
+        self.step = 0
+        self.switch_steps = [max_steps // 2]
+        self.data_rate_fn1 = self.scen1.data_rate_fn
+        self.data_rate_fn2 = self.scen2.data_rate_fn
+        self.data_rate_fn = self.data_rate_fn1
+        self.associations = self.scen1.associations
+
+    def __call__(self, key, link_ap_sta):
+        self.step += 1
+        if self.step in self.switch_steps:
+            self.data_rate_fn = self.data_rate_fn2 if self.data_rate_fn is self.data_rate_fn1 else self.data_rate_fn1
+
+        return self.data_rate_fn(key, link_ap_sta=link_ap_sta)
+
+
+scenario = MixScen(simple_scenario_5, 2, 4, total_steps)
 
 agent_factory = MapcAgentFactory(
     associations=scenario.associations,
@@ -95,4 +116,3 @@ plt.grid(True, linestyle="--", alpha=0.35)
 plt.legend()
 plt.tight_layout()
 plt.show()
-

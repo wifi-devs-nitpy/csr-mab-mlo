@@ -1,6 +1,6 @@
 import numpy as np
 from itertools import product 
-import jax.numpy as jnp 
+import jax.numpy as jnp
 
 
 # a = np.array([1, 2, 3, 1, 5])
