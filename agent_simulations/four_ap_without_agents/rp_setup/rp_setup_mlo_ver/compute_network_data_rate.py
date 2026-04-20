@@ -174,7 +174,7 @@ def random_search_max_throughput(
 
 @jax.jit
 def compute_max_throughput(d_ap, n_tx_power_levels=4, n_links=3):
-    ap_sta_pairs = jnp.asarray([(0, 4), (1, 9), (2, 14)])
+    ap_sta_pairs = jnp.asarray([(0, 4), (1, 9)])
     aps = ap_sta_pairs[:, 0]
 
     list_of_links = jnp.arange(n_links, dtype=jnp.int32)

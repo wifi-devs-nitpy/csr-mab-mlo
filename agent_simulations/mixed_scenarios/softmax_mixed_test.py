@@ -44,24 +44,28 @@ scenario = MixScen(simple_scenario_5, 2, 4, total_steps)
 
 agent_factory = MapcAgentFactory(
     associations=scenario.associations,
-    agent_type=UCB,
-     agent_params_lvl1={
-        "c": 2.0,
-        "gamma": 0.98
+    agent_type=Softmax,
+    agent_params_lvl1 = {
+        "lr": 0.01,
+        "tau": 0.6,
+        "alpha": 0.3,
     },
-    agent_params_lvl2={
-        "c": 2.0,
-        "gamma": 0.98
+    agent_params_lvl2 = {
+        "lr": 0.01,
+        "tau": 0.8,
+        "alpha": 0.4,
     },
-    agent_params_lvl3={
-        "c": 1.5,
-        "gamma": 0.995
+    agent_params_lvl3 = {
+        "lr": 0.01,
+        "tau": 0.8,
+        "alpha": 0.4,
     },
-    agent_params_lvl4={
-        "c": 1.5,
-        "gamma": 0.995
+    agent_params_lvl4 = {
+        "lr": 0.005,
+        "tau": 0.6,
+        "alpha": 0.3,
     },
-    tx_power_levels=12
+    tx_power_levels=n_tx_power_levels,
 )
 
 
@@ -109,7 +113,7 @@ x_ema = np.arange(throughput_ema.shape[0])
 plt.figure(figsize=(11, 7))
 plt.plot(x_raw, throughput_np, linewidth=1.2, alpha=0.25, color="tab:blue", label="Throughput (raw)")
 plt.plot(x_ema, throughput_ema, linewidth=2, color="blue", label="Throughput (EMA)")
-plt.title("UCB-Convergence of")
+plt.title("SoftxMax")
 plt.xlabel("Step")
 plt.ylabel("Throughput")
 plt.grid(True, linestyle="--", alpha=0.35)

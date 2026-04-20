@@ -15,32 +15,40 @@ import sys
 n_tx_power_levels: int = 12
 
 scenario = simple_scenario_5(d_ap=30, d_sta=2, mcs=11, n_tx_power_levels=n_tx_power_levels)
-total_steps = 5000
+total_steps = 10000
 agent_name = "EGreedy_shar_ap_s_fixed"
+
+agent_params_lvl1 = {
+    "e": 0.08,
+    "optimistic_start": 60.0,
+    "alpha": 0.5
+}
+
+agent_params_lvl2 = {
+    "e": 0.08,
+    "optimistic_start": 60.0,
+    "alpha": 0.5
+}
+
+agent_params_lvl3 = {
+    "e": 0.03,
+    "optimistic_start": 45.0,
+    "alpha": 0.3
+}
+
+agent_params_lvl4 = {
+    "e": 0.03,
+    "optimistic_start": 45.0,
+    "alpha": 0.3
+}
 
 agent_factory = MapcAgentFactory(
     associations=scenario.associations,
     agent_type=EGreedy,
-    agent_params_lvl1={
-        "e": 0.021079147434349507,
-        "optimistic_start": 28.02580115407505,
-        "alpha": 0.6190443508011634
-    },
-    agent_params_lvl2={
-        "e": 0.029119085412665096,
-        "optimistic_start": 52.67521144731224,
-        "alpha": 0.525786225102296
-    },
-    agent_params_lvl3={
-        "e": 0.03003810096861446,
-        "optimistic_start": 65.24736631881609,
-        "alpha": 0.808941375014292
-    },
-    agent_params_lvl4={
-        "e": 0.059353379674557366,
-        "optimistic_start": 18.235559629882363,
-        "alpha": 0.8252966772746064
-    },
+    agent_params_lvl1=agent_params_lvl1,
+    agent_params_lvl2=agent_params_lvl2,
+    agent_params_lvl3=agent_params_lvl3,
+    agent_params_lvl4=agent_params_lvl4,
     tx_power_levels=n_tx_power_levels
 )
 
