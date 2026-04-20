@@ -178,3 +178,4 @@ pdfs
 **/*.zip
 **/*.png
 **/*.npy
+**/*.html
