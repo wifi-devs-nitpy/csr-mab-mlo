@@ -38,15 +38,15 @@ rates4 = compute_throughput_in_batch(ap_station_pair_4, d, False)
 max_throughputs = compute_max_throughput_in_batch(d)
 
 
-# script_dir = os.path.dirname(os.path.abspath(__file__))
-# arrays_dir = os.path.join(script_dir, "arrays")
-# os.makedirs(arrays_dir, exist_ok=True)
+script_dir = os.path.dirname(os.path.abspath(__file__))
+arrays_dir = os.path.join(script_dir, "arrays")
+os.makedirs(arrays_dir, exist_ok=True)
 
 # jnp.save(f"{arrays_dir}/rates1.npy", rates1)
 # jnp.save(f"{arrays_dir}/rates2.npy", rates2)
 # jnp.save(f"{arrays_dir}/rates3.npy", rates3)
 # jnp.save(f"{arrays_dir}/rates4.npy", rates4)
-# jnp.save(f"{arrays_dir}/max_throughputs_2.py", max_throughputs)
+jnp.save(f"{arrays_dir}/max_throughputs_2AP_2.py", max_throughputs)
 
 plt.figure(figsize=(7, 6))
 plt.plot(d, rates4, label='Four Aps', color = 'purple', linestyle='-')
@@ -96,7 +96,7 @@ fig.add_trace(
         x=d,
         y=max_throughputs,
         mode='lines',
-        name='Max Throughput',
+        name='Max Throughput 2_AP',
         line=dict(color='orange', dash='dashdot', width=2.2),
         opacity=0.95
     )

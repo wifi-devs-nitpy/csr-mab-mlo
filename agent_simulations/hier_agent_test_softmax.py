@@ -17,57 +17,32 @@ scenario = simple_scenario_5(d_ap=30, d_sta=2, mcs=11, n_tx_power_levels=n_tx_po
 total_steps = 10_000
 agent_name = "Softmax"
 
-# agent_factory = MapcAgentFactory(
-#     associations=scenario.associations,
-#     agent_type=Softmax,
-#     agent_params_lvl1 = {
-#         "lr": 0.01,
-#         "tau": 0.6,
-#         "alpha": 0.3,
-#     },
-#     agent_params_lvl2 = {
-#         "lr": 0.01,
-#         "tau": 0.8,
-#         "alpha": 0.4,
-#     },
-#     agent_params_lvl3 = {
-#         "lr": 0.01,
-#         "tau": 0.8,
-#         "alpha": 0.4,
-#     },
-#     agent_params_lvl4 = {
-#         "lr": 0.005,
-#         "tau": 0.6,
-#         "alpha": 0.3,
-#     },
-#     tx_power_levels=n_tx_power_levels,
-# )
-
 agent_factory = MapcAgentFactory(
     associations=scenario.associations,
     agent_type=Softmax,
     agent_params_lvl1 = {
-        "lr": 0.43664735929796333,
-        "tau": 0.23426581058204046,
-        "alpha": 0.9695846277645586,
+        "lr": 0.01,
+        "tau": 0.6,
+        "alpha": 0.3,
     },
     agent_params_lvl2 = {
-        "lr": 2.1154290797261215,
-        "tau": 7.56829206016762,
-        "alpha": 0.8948273504276488,
+        "lr": 0.01,
+        "tau": 0.8,
+        "alpha": 0.4,
     },
     agent_params_lvl3 = {
-        "lr": 0.6218704727769077,
-        "tau": 6.978281265126034,
-        "alpha": 0.0884925020519195,
+        "lr": 0.01,
+        "tau": 0.8,
+        "alpha": 0.4,
     },
     agent_params_lvl4 = {
-        "lr": 0.03872118032174583,
-        "tau": 0.12315571723666023,
-        "alpha": 0.32533033076326434,
+        "lr": 0.005,
+        "tau": 0.6,
+        "alpha": 0.3,
     },
     tx_power_levels=n_tx_power_levels,
 )
+
 
 agent = agent_factory.create_hierarchical_mapc_agent()
 
