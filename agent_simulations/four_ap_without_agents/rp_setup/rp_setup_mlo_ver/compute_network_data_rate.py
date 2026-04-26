@@ -97,14 +97,14 @@ def compute_throughput(ap_sta_pairs: jax.Array, d_ap: int, plot: bool = False, d
     link_ap_sta = (tx_matrices, tx_power_indices)
 
     #implementing the jit compilation 
-    fast_network_data_rate = jax.jit(partial(network_data_rate_mlo, pos=pos, mcs=mcs, sigma=sigma, walls=walls, n_tx_power_levels=n_tx_power_levels))
+    # fast_network_data_rate = jax.jit(partial(network_data_rate_mlo, pos=pos, mcs=mcs, sigma=sigma, walls=walls, n_tx_power_levels=n_tx_power_levels))
 
     # first usually takes longer time -> so running it to avoid execution times in the actual runs
-    fast_network_data_rate(key=key, link_ap_sta=link_ap_sta)
+    # fast_network_data_rate(key=key, link_ap_sta=link_ap_sta)
 
     for _ in range(200):
         key, run_key = jax.random.split(key, 2)
-        rate = fast_network_data_rate(key=run_key, pos=pos, mcs=mcs, sigma=sigma, walls=walls, link_ap_sta=link_ap_sta)
+        rate = network_data_rate_mlo(key=run_key, pos=pos, mcs=mcs, sigma=sigma, walls=walls, link_ap_sta=link_ap_sta)
         data_rate.append(rate)
 
     return jnp.asarray(data_rate).mean()
@@ -280,8 +280,8 @@ def compute_max_throughput(d_ap, n_tx_power_levels=4, n_links=3):
 
 
 if __name__ == "__main__": 
-    # compute_throughput([(0, 4), (1, 9), (2, 14), (3, 19)], d_ap = 30, plot=False)
-    print(compute_max_throughput(50))
+    compute_throughput([(0, 4)], d_ap = 10, plot=False)
+    # print(compute_max_throughput(10))
     # run this module to plot the scenario arrangement\
 
 

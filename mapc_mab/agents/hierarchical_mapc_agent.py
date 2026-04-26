@@ -202,5 +202,7 @@ class HierarchicalMapcAgent(MapcAgent):
 
         tx_matrices = np.array(list(link_ap_sta[r]["tx_matrix"] for r in range(0, 3)), dtype=np.int16)
         tx_power_indices = np.array(list(link_ap_sta[r]["tx_power_indices"] for r in range(0, 3)), dtype=np.int16)
+        # tx_power_indices = np.ones(shape=(3, self.n_nodes), dtype=np.int32) * 7
+
 
         return (tx_matrices, tx_power_indices)

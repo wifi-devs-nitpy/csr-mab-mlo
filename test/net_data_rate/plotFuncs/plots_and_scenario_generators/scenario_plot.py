@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import string
 from copy import copy, deepcopy
+import jax 
+import jax.numpy as jnp
 
 import numpy as np
 
@@ -57,7 +59,7 @@ def plot_network_scenario(
     # converting to numpy arrays bcz matplotlib cannot understand jax arrays 
     pos = np.asarray(pos)
     
-    fig, ax = plt.subplots(figsize=figsize)
+    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
 
     for i, ap in enumerate(associations):
         ax.scatter(
@@ -139,3 +141,42 @@ def plot_network_scenario(
 
     plt.tight_layout()
     plt.show()
+
+
+if __name__ == "__main__":
+    d_ap = 20
+    d_ap_sta = 4
+    n_ap = 4
+    n_sta_per_ap = 4
+
+    ap_pos = jnp.array([
+        [0, 0], 
+        [1, 0], 
+        [1, 1], 
+        [0, 1]
+    ]) * d_ap 
+
+    dx = jnp.array([-1, 1, 1, -1]) * d_ap_sta / jnp.sqrt(2)
+    dy = jnp.array([-1, -1, 1, 1]) * d_ap_sta / jnp.sqrt(2)
+
+    sta_pos = [[x + dx[i], y + dy[i]] for (x, y) in ap_pos for i in range(len(dx))]
+
+    pos = jnp.concatenate([ap_pos, jnp.array(sta_pos)], axis=0)
+
+    associations = {
+        i: list(range((n_ap + i*n_sta_per_ap), (n_ap + (i+1)*n_sta_per_ap)))
+
+        for i in range(4)
+    }
+
+    n_nodes = pos.shape[0]
+
+    ap_sta_pairs = [[0, 5]]
+
+    tx = jnp.zeros((n_nodes, n_nodes))
+    ap_sta_pairs_array = jnp.asarray(ap_sta_pairs)
+
+    tx = tx.at[ap_sta_pairs_array[:, 0], ap_sta_pairs_array[:, 1]].set(1)
+    tx=None
+
+    plot_network_scenario(associations=associations, pos=pos, tx=tx)

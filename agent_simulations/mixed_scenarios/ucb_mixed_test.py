@@ -103,16 +103,33 @@ throughput_np = np.asarray(throughput)
 
 throughput_ema = np.asarray(ema(throughput_np, alpha=0.03))
 
-x_raw = np.arange(throughput_np.shape[0])
-x_ema = np.arange(throughput_ema.shape[0])
+trials_per_second = 200
+time_per_trial = 1/(trials_per_second)
+x_raw = np.arange(throughput_np.shape[0]) * time_per_trial
+x_ema = np.arange(throughput_ema.shape[0]) * time_per_trial
 
-plt.figure(figsize=(11, 7))
-plt.plot(x_raw, throughput_np, linewidth=1.2, alpha=0.25, color="tab:blue", label="Throughput (raw)")
-plt.plot(x_ema, throughput_ema, linewidth=2, color="blue", label="Throughput (EMA)")
-plt.title("Hierarchical UCB Throughput")
-plt.xlabel("Step")
-plt.ylabel("Throughput")
+plt.figure(figsize=(11, 7), dpi=300)
+plt.plot(x_raw, throughput_np, linewidth=1.2, alpha=0.25, color="tab:blue", label="Throughput (actual)")
+plt.plot(x_ema, throughput_ema, linewidth=2, color="blue", label="Average Throughput")
+plt.title(
+    "Hierarchical MAB (UCB) Throughput Over Time",
+    fontsize=18,
+    fontweight="bold",
+    pad=14,
+)
+ax = plt.gca()
+ax.set_xlabel("Time (s)", fontsize=16, fontweight="bold", labelpad=12, )
+ax.set_ylabel("Throughput [Mb/s]", fontsize=16, fontweight="bold", labelpad=12, )
+ax.axhline(y=1050, linestyle="--", linewidth=2, color="black", label="one_ap max throughput")
+ax.tick_params(axis="both", labelsize=14, width=1.4, colors="black", pad=6)
+for tick in ax.get_xticklabels() + ax.get_yticklabels():
+    tick.set_fontweight("bold")
+    tick.set_color("black")
 plt.grid(True, linestyle="--", alpha=0.35)
-plt.legend()
+plt.legend(prop={"size": 12, "weight": "semibold"})
 plt.tight_layout()
 plt.show()
+
+print("="*30)
+print("plotting the histogram of the throughputs")
+plot_throughput_histogram(throughput_np)

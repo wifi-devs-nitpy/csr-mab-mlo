@@ -2,6 +2,7 @@ from mapc_mab.envs.static_scenarios import simple_scenario_5
 import jax.numpy as jnp
 import jax
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 from mapc_mab.agents.mapc_agent_factory import MapcAgentFactory
 from reinforced_lib.agents.mab import EGreedy, Softmax, UCB, ThompsonSampling
 from tqdm import tqdm
@@ -16,9 +17,11 @@ import os
 
 n_tx_power_levels: int = 12
 
-scenario = simple_scenario_5(d_ap=30, d_sta=2, mcs=11, n_tx_power_levels=n_tx_power_levels)
+d_ap = 40
+
+scenario = simple_scenario_5(d_ap=d_ap, d_sta=2, mcs=11, n_tx_power_levels=n_tx_power_levels)
 total_steps = 5000
-n_reps = 1
+n_reps = 10
 agent_name = "nr_ucb"
 
 agent_factory = MapcAgentFactory(
@@ -45,6 +48,7 @@ agent_factory = MapcAgentFactory(
 
 
 throughput = [0]
+actions = []
 
 key = jax.random.PRNGKey(seed=42)
 
@@ -58,6 +62,7 @@ def run_agent(run_number: int, key, n_steps=5000):
         link_ap_sta = agent.sample(throughput[-1])
         data_rate = scenario.__call__(run_key, link_ap_sta)
         throughput.append(data_rate)
+        # actions.append(jnp.stack(jnp.where(link_ap_sta[0] == 1), axis=1))
     return jnp.asarray(throughput)
 
 def compute_multiple_runs(run_numbers, keys, n_steps):
@@ -80,19 +85,47 @@ throughput_np = np.asarray(throughput)
 
 # EMA smoothing for cleaner trend visualization
 
-throughput_ema = np.asarray(ema(throughput_np, alpha=0.03))
+# throughput_ema = np.asarray(ema(throughput_np, alpha=0.03))
+throughput_ema = jnp.convolve(throughput, jnp.ones(100)/100, mode='same')
 
-x_raw = np.arange(throughput_np.shape[0])
-x_ema = np.arange(throughput_ema.shape[0])
+trials_per_second = 200
+time_per_trial = 1/(trials_per_second)
+x_raw = np.arange(throughput_np.shape[0]) * time_per_trial
+x_ema = np.arange(throughput_ema.shape[0]) * time_per_trial
 
-plt.figure(figsize=(11, 7))
-plt.plot(x_raw, throughput_np, linewidth=1.2, alpha=0.25, color="tab:blue", label="Throughput (raw)")
-plt.plot(x_ema, throughput_ema, linewidth=2, color="blue", label="Throughput (EMA)")
-plt.title("Hierarchical UCB Throughput")
-plt.xlabel("Step")
-plt.ylabel("Throughput")
+plt.figure(figsize=(11, 7), dpi=300)
+plt.plot(x_raw, throughput_np, linewidth=1.2, alpha=0.25, color="tab:blue", label="Throughput (actual)")
+plt.plot(x_ema, throughput_ema, linewidth=2, color="blue", label="Average Throughput")
+throughput_single_link = jnp.load(f"C:/Users/studi/Desktop/Electronics/wireless_networks/wifi-9/mab_single_Link/agent_simulations/arrays/ucb/d_{d_ap}/smoothed_throughput.npy")
+
+plt.plot(x_raw, throughput_single_link.tolist(), linewidth=1.2, color="orange", label="Throughput single link")
+
+plt.title(
+    "Hierarchical MAB (UCB) Throughput Over Time",
+    fontsize=18,
+    fontweight="bold",
+    pad=14,
+)
+
+ax = plt.gca()
+ax.axhline(y=1020, linestyle="--", linewidth=2, color="black", label="one_ap max throughput")
+ax.set_xlabel("Time (s)", fontsize=16, fontweight="bold", labelpad=12, )
+ax.set_ylabel("Throughput [Mb/s]", fontsize=16, fontweight="bold", labelpad=12, )
+ax.tick_params(axis="both", labelsize=14, width=1.4, colors="black", pad=6)
+for tick in ax.get_xticklabels() + ax.get_yticklabels():
+    tick.set_fontweight("bold")
+    tick.set_color("black")
 plt.grid(True, linestyle="--", alpha=0.35)
-plt.legend()
+plt.legend(prop={"size": 12, "weight": "semibold"})
 plt.tight_layout()
 plt.show()
 
+
+
+
+rows1 = [{"throughput": thr.item()} for thr in throughput]
+rows2 = [{"action": action.tolist()} for action in actions]
+
+rows = [{**r1, **r2} for r1, r2 in zip(rows1, rows2)] 
+import pandas as pd
+df = pd.DataFrame(rows, columns=["action", "throughput"])

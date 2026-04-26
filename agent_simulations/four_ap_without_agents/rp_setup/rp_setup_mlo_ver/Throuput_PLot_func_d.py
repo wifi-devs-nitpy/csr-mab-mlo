@@ -35,17 +35,17 @@ rates3 = compute_throughput_in_batch(ap_station_pair_3, d, False)
 ap_station_pair_4 = [(0, 4), (1, 9), (2, 14), (3, 19)]
 rates4 = compute_throughput_in_batch(ap_station_pair_4, d, False)
 
-max_throughputs = compute_max_throughput_in_batch(d)
+# max_throughputs = compute_max_throughput_in_batch(d)
 
 
-# script_dir = os.path.dirname(os.path.abspath(__file__))
-# arrays_dir = os.path.join(script_dir, "arrays")
-# os.makedirs(arrays_dir, exist_ok=True)
+script_dir = os.path.dirname(os.path.abspath(__file__))
+arrays_dir = os.path.join(script_dir, "arrays")
+os.makedirs(arrays_dir, exist_ok=True)
 
-# jnp.save(f"{arrays_dir}/rates1.npy", rates1)
-# jnp.save(f"{arrays_dir}/rates2.npy", rates2)
-# jnp.save(f"{arrays_dir}/rates3.npy", rates3)
-# jnp.save(f"{arrays_dir}/rates4.npy", rates4)
+jnp.save(f"{arrays_dir}/rates1.npy", rates1)
+jnp.save(f"{arrays_dir}/rates2.npy", rates2)
+jnp.save(f"{arrays_dir}/rates3.npy", rates3)
+jnp.save(f"{arrays_dir}/rates4.npy", rates4)
 # jnp.save(f"{arrays_dir}/max_throughputs_2.py", max_throughputs)
 
 plt.figure(figsize=(7, 6))
@@ -53,19 +53,19 @@ plt.plot(d, rates4, label='Four Aps', color = 'purple', linestyle='-')
 plt.plot(d, rates3, label='Three Aps', color='teal', linestyle='-')
 plt.plot(d, rates2, label='Two Aps', color='green', linestyle='-')
 plt.plot(d, rates1, label='One AP', color='black', linestyle='--')
-plt.plot(
-    d,
-    max_throughputs,
-    label='Max Throughput',
-    color='orange',
-    linestyle='-.',
-    linewidth=2.2,
-    marker='*',
-    markersize=7,
-    markevery=16,
-    alpha=0.95,
-    zorder=5
-)
+# plt.plot(
+#     d,
+#     max_throughputs,
+#     label='Max Throughput',
+#     color='orange',
+#     linestyle='-.',
+#     linewidth=2.2,
+#     marker='*',
+#     markersize=7,
+#     markevery=16,
+#     alpha=0.95,
+#     zorder=5
+# )
 plt.xlabel('Distance d[m] ')
 plt.xscale('log')
 plt.xticks([10, 30, 50, 100], [10, 30, 50, 100])
@@ -91,28 +91,28 @@ fig.add_trace(go.Scatter(x=d, y=rates4, mode='lines', name='Four Aps', line=dict
 fig.add_trace(go.Scatter(x=d, y=rates3, mode='lines', name='Three Aps', line=dict(color='teal')))
 fig.add_trace(go.Scatter(x=d, y=rates2, mode='lines', name='Two Aps', line=dict(color='green')))
 fig.add_trace(go.Scatter(x=d, y=rates1, mode='lines', name='One AP', line=dict(color='black', dash='dash')))
-fig.add_trace(
-    go.Scatter(
-        x=d,
-        y=max_throughputs,
-        mode='lines',
-        name='Max Throughput',
-        line=dict(color='orange', dash='dashdot', width=2.2),
-        opacity=0.95
-    )
-)
+# fig.add_trace(
+#     go.Scatter(
+#         x=d,
+#         y=max_throughputs,
+#         mode='lines',
+#         name='Max Throughput',
+#         line=dict(color='orange', dash='dashdot', width=2.2),
+#         opacity=0.95
+#     )
+# )
 
-fig.add_trace(
-    go.Scatter(
-        x=d[::16],
-        y=max_throughputs[::16],
-        mode='markers',
-        name='Max Throughput (markers)',
-        marker=dict(color='orange', symbol='star', size=7),
-        showlegend=False,
-        opacity=0.95
-    )
-)
+# fig.add_trace(
+#     go.Scatter(
+#         x=d[::16],
+#         y=max_throughputs[::16],
+#         mode='markers',
+#         name='Max Throughput (markers)',
+#         marker=dict(color='orange', symbol='star', size=7),
+#         showlegend=False,
+#         opacity=0.95
+#     )
+# )
 fig.add_vline(x=10, line=dict(color='red', dash='dash', width=1))
 fig.add_vline(x=30, line=dict(color='red', dash='dash', width=1))
 fig.add_vline(x=50, line=dict(color='red', dash='dash', width=1))
@@ -139,4 +139,4 @@ for x, y in [("one", max(rates1)), ("two", max(rates2)), ("three", max(rates3)),
     print(f"{x:<15} | {y:<15.4f}")
 
 
-print(max_throughputs)
+# print(max_throughputs)
